@@ -8,8 +8,8 @@ void printArray( int array[] , int size);
 void initializeMatrix( double * Matrix, int rows, int columns );
 void printMatrix( double *Matrix , int rows, int cols );
 
-void activationFunction( double *a );
-//void activationFunction( );
+//void activationFunction( double *a );
+void activationFunction( );
 
 int main(int argc, char *argv[])
 {
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
       //--------------------------------------------------------------------
       //test activation function!
       //activationFunction( 5.0 );
-      activationFunction( features );
+      activationFunction( );
       //--------------------------------------------------------------------
       //--------------------------------------------------------------------
       //--------------------------------------------------------------------
@@ -87,26 +87,38 @@ void printMatrix( double *Matrix , int rows, int cols ){
       }
 }
 
-void activationFunction( double *a ){
+void activationFunction( ){
+      double * a = (double *)mkl_malloc( 2 * 2*sizeof( double ), 64 );
+      double * y = (double *)mkl_malloc( 2 * 2*sizeof( double ), 64 );
+      double * Z = (double *)mkl_malloc( 2 * 2*sizeof( double ), 64 );
+      
+      initializeMatrix( a , 2 , 2);
+      initializeMatrix( y , 2 , 2);
+      initializeMatrix( Z , 2 , 2);
 
-      double * Z = (double *)mkl_malloc( 10 * 2*sizeof( double ), 64 );
-      initializeMatrix( Z , 10 , 2);
+      a[0]	=  0.74346118;  a[1]  =  0.46465633;
+      a[2]	=  1.65755662;  a[3]  = -0.63203157;
+
+      cout << "A is " << endl;
+      printMatrix( a , 2, 2);
 
       //calculate exponential!
       //multiply by -1
-      for (int i = 0; i < (10*2); i++) {
+      for (int i = 0; i < (2*2); i++) {
 	    a[i] = a[i] * (-1);
       }
 
-      vdExp( (10*2), a, a );
+      vdExp( 4, a, a );
+      //cout << "Y is " << endl;
+      //printMatrix( y , 2 , 2);
 
       //compute activation!
-      for (int i = 0; i < (10*2); i++) {
+      for (int i = 0; i < (2*2); i++) {
 	    Z[i] = 1/( 1 + a[i]);
       }
 
       cout << "Z is " << endl;
-      printMatrix( Z , 10 , 2);
+      printMatrix( Z , 2 , 2);
 
 }
 
