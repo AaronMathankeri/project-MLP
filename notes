@@ -1,0 +1,21 @@
+==========
+Wed Feb 22 18:50:05 CST 2017
+- need to figure out a python implementation and translate to C++.
+- must be able to read in a dataset
+- then analyse with simple neural network
+
+==========
+Wed Feb 22 19:10:58 CST 2017
+- finished the python implementation
+- write the dataset to a file
+
+==========
+Thu Feb 23 15:52:40 CST 2017
+- assume data is in right format. how does that look in C++?
+  - is it a matrix?, a vector? an array?
+==========
+Thu Feb 23 15:54:38 CST 2017
+for now, hard code values from first 10 elements in python src!
+==========
+Thu Feb 23 19:36:58 CST 2017
+alright, took care of all the I/O. Now time for the actual ML!
