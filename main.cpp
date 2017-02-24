@@ -3,8 +3,8 @@
 #include "mathimf.h"
 
 using namespace std;
-int NUM_SAMPLES = 10;
-int NUM_FEATURES = 2;
+const int NUM_SAMPLES = 10;
+const int NUM_FEATURES = 2;
 
 void printArray( int array[] , int size);
 void printMatrix( double *Matrix , int rows, int cols );
@@ -134,9 +134,11 @@ void errorFunction(){
       cout << "diff is ..." << endl;
       printMatrix( diff , 1 , NUM_FEATURES);
 
-      //get squared value
-      vdPowx( (NUM_FEATURES) , diff, 2, diff);
-      cout << "diff is ..." << endl;
-      printMatrix( diff , 1 , NUM_FEATURES);
-      
+      //get norm
+      double res = 0.0;
+      const int incx = 1;
+      res = dnrm2( &NUM_FEATURES, diff, &incx);
+      res *= res;
+      cout << "diff is ..." << res << endl;
+      //printMatrix( diff , 1 , NUM_FEATURES);
 }
