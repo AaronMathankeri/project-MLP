@@ -3,13 +3,16 @@
 #include "mathimf.h"
 
 using namespace std;
+int NUM_SAMPLES = 10;
+int NUM_FEATURES = 2;
 
 void printArray( int array[] , int size);
-void initializeMatrix( double * Matrix, int rows, int columns );
 void printMatrix( double *Matrix , int rows, int cols );
 
+void initializeMatrix( double * Matrix, int rows, int columns );
+
 void activationFunction( double *a );
-//void activationFunction( );
+void errorFunction( );
 
 int main(int argc, char *argv[])
 {
@@ -33,8 +36,7 @@ int main(int argc, char *argv[])
       cout << "targets are :" << endl;
       printArray( targets , 10 );
       //--------------------------------------------------------------------
-      int NUM_SAMPLES = 10;
-      int NUM_FEATURES = 2;
+
       double * features = (double *)mkl_malloc( NUM_SAMPLES* NUM_FEATURES*sizeof( double ), 64 );
       initializeMatrix( features, NUM_SAMPLES, NUM_FEATURES );
 
@@ -52,8 +54,6 @@ int main(int argc, char *argv[])
 
       printMatrix( features, NUM_SAMPLES, NUM_FEATURES );
       //--------------------------------------------------------------------
-      //test activation function!
-      //activationFunction( 5.0 );
       activationFunction( features );
       //--------------------------------------------------------------------
       //--------------------------------------------------------------------
@@ -89,24 +89,23 @@ void printMatrix( double *Matrix , int rows, int cols ){
 
 void activationFunction( double *a ){
 
-      double * Z = (double *)mkl_malloc( 10 * 2*sizeof( double ), 64 );
-      initializeMatrix( Z , 10 , 2);
+      double * Z = (double *)mkl_malloc( NUM_SAMPLES * NUM_FEATURES*sizeof( double ), 64 );
+      initializeMatrix( Z , NUM_SAMPLES , NUM_FEATURES);
 
       //calculate exponential!
       //multiply by -1
-      for (int i = 0; i < (10*2); i++) {
+      for (int i = 0; i < (NUM_SAMPLES*NUM_FEATURES); i++) {
 	    a[i] = a[i] * (-1);
       }
 
-      vdExp( (10*2), a, a );
+      vdExp( (NUM_SAMPLES*NUM_FEATURES), a, a );
 
       //compute activation!
-      for (int i = 0; i < (10*2); i++) {
+      for (int i = 0; i < (NUM_SAMPLES*NUM_FEATURES); i++) {
 	    Z[i] = 1/( 1 + a[i]);
       }
 
       cout << "Z is " << endl;
-      printMatrix( Z , 10 , 2);
-
+      printMatrix( Z , NUM_SAMPLES , NUM_FEATURES);
 }
 
