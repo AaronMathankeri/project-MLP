@@ -113,4 +113,30 @@ void activationFunction( double *a ){
 void errorFunction(){
 
       cout << "Error function for training" << endl;
+      double * t = (double *)mkl_malloc( 1 * NUM_FEATURES*sizeof( double ), 64 );
+      double * y = (double *)mkl_malloc( 1 * NUM_FEATURES*sizeof( double ), 64 );
+      double * diff = (double *)mkl_malloc( 1 * NUM_FEATURES*sizeof( double ), 64 );
+
+      printf (" Intializing matrix data\n");
+      for (int i = 0; i < (1*NUM_FEATURES); i++) {
+	    t[i] = (double)(i + 1);
+	    y[i] = (double)(-i -1);
+	    diff[i] = (double)(0.0);
+      }
+      cout << " targets" << endl;
+      printMatrix( t, 1 , NUM_FEATURES);
+      cout << "outputs" << endl;
+      printMatrix( y, 1 , NUM_FEATURES);
+
+      double value = 0.0;
+      //subtract them!
+      vdSub( (NUM_FEATURES) , t , y, diff);
+      cout << "diff is ..." << endl;
+      printMatrix( diff , 1 , NUM_FEATURES);
+
+      //get squared value
+      vdPowx( (NUM_FEATURES) , diff, 2, diff);
+      cout << "diff is ..." << endl;
+      printMatrix( diff , 1 , NUM_FEATURES);
+      
 }
