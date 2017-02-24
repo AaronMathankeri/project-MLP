@@ -1,5 +1,5 @@
 CC=icpc
-FLAGS=-std=c++11 -mkl -L /opt/intel/mkl/lib/ 
+FLAGS=-std=c++11 -mkl
 
 all: compile clean
 

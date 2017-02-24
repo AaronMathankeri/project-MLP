@@ -3,8 +3,8 @@
 #include "mathimf.h"
 
 using namespace std;
-int NUM_SAMPLES = 10;
-int NUM_FEATURES = 2;
+const int NUM_SAMPLES = 10;
+const int NUM_FEATURES = 2;
 
 void printArray( int array[] , int size);
 void printMatrix( double *Matrix , int rows, int cols );
@@ -12,7 +12,7 @@ void printMatrix( double *Matrix , int rows, int cols );
 void initializeMatrix( double * Matrix, int rows, int columns );
 
 void activationFunction( double *a );
-void errorFunction( );
+void errorFunction(double *t , double *y);
 
 int main(int argc, char *argv[])
 {
@@ -56,7 +56,6 @@ int main(int argc, char *argv[])
       //--------------------------------------------------------------------
       activationFunction( features );
       //--------------------------------------------------------------------
-      errorFunction( );
       //--------------------------------------------------------------------
       //--------------------------------------------------------------------
       return 0;
@@ -110,7 +109,27 @@ void activationFunction( double *a ){
       printMatrix( Z , NUM_SAMPLES , NUM_FEATURES);
 }
 
-void errorFunction(){
+void errorFunction( double *targets, double *finalOutputs){
 
       cout << "Error function for training" << endl;
+      double * diff = (double *)mkl_malloc( NUM_SAMPLES * NUM_FEATURES*sizeof( double ), 64 );
+      double res = 0.0;
+      const int incx = 1;
+      int totalElements = 0;
+      totalElements = NUM_SAMPLES * NUM_FEATURES;
+
+      for (int i = 0; i < (totalElements); i++) {
+	    diff[i] = (double)(0.0);
+      }
+
+      //subtract them!
+      vdSub( totalElements , targets , finalOutputs, diff);
+
+      //get norm
+      res = dnrm2( &(totalElements), diff, &incx);
+
+      //get norm squared
+      res *= res;
+
+      cout << "Error = " << res << endl;
 }
