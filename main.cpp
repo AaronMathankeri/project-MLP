@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
       //--------------------------------------------------------------------
       activationFunction( features );
       //--------------------------------------------------------------------
+      errorFunction( );
       //--------------------------------------------------------------------
       //--------------------------------------------------------------------
       return 0;
@@ -88,11 +89,11 @@ void printMatrix( double *Matrix , int rows, int cols ){
 }
 
 void activationFunction( double *a ){
+      //sigma(a) = 1/(1 + exp(-a))
 
       double * Z = (double *)mkl_malloc( NUM_SAMPLES * NUM_FEATURES*sizeof( double ), 64 );
       initializeMatrix( Z , NUM_SAMPLES , NUM_FEATURES);
 
-      //calculate exponential!
       //multiply by -1
       for (int i = 0; i < (NUM_SAMPLES*NUM_FEATURES); i++) {
 	    a[i] = a[i] * (-1);
@@ -109,3 +110,7 @@ void activationFunction( double *a ){
       printMatrix( Z , NUM_SAMPLES , NUM_FEATURES);
 }
 
+void errorFunction(){
+
+      cout << "Error function for training" << endl;
+}
