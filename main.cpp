@@ -87,66 +87,15 @@ void printMatrix( double *Matrix , int rows, int cols ){
       }
 }
 
-//void activationFunction( double *a ){
-void activationFunction( ){
-      /*
-      //logistic sigmoid
-      double value = 0.0;
-
-      value = 1/( 1 + exp( -a ) );
-
-      cout <<"Value " << a << " is transformed to " << value << endl;
-      */
-      double * a = (double *)mkl_malloc( 1 * 2*sizeof( double ), 64 );
-      double * y = (double *)mkl_malloc( 1 * 2*sizeof( double ), 64 );
-      double * v = (double *)mkl_malloc( 1 * 2*sizeof( double ), 64 );
-      for (int i = 0; i < (1*2); i++) {
-	    a[i] = (double)(0.0);
-	    y[i] = (double)(0.0);
-	    v[i] = (double)(0.0);
-      }
-      a[0] = 1.0;
-      a[1] = 2.0;
-
-      cout << "A is " << endl;
-      for (int i = 0; i < (1*2); i++) {
-	    cout << a[i] <<" , " ;
-      }
-      cout << endl;
-
-      //multiply by -1
-      for (int i = 0; i < (1*2); i++) {
-	    a[i] = a[i] * (-1);
-      }
-
-      //calculate exponential!
-      vdExp( 2, a, y );
-
-      cout << "y is " << endl;
-      for (int i = 0; i < (1*2); i++) {
-	    cout << y[i] <<" , " ;
-      }
-      cout << endl;
-
-      //compute activation!
-      for (int i = 0; i < (1*2); i++) {
-	    v[i] = 1/( 1 + y[i]);
-      }
-
-      cout << "v is " << endl;
-      for (int i = 0; i < (1*2); i++) {
-	    cout << v[i] <<" , " ;
-      }
-      cout << endl;
-}
-
-/* extended to opertating on a matrix of data
 void activationFunction( ){
       double * a = (double *)mkl_malloc( 2 * 2*sizeof( double ), 64 );
       double * y = (double *)mkl_malloc( 2 * 2*sizeof( double ), 64 );
+      double * Z = (double *)mkl_malloc( 2 * 2*sizeof( double ), 64 );
+
       for (int i = 0; i < (2*2); i++) {
 	    a[i] = (double)(0.0);
 	    y[i] = (double)(0.0);
+	    Z[i] = (double)(0.0);
       }
       a[0]	=  0.74346118;  a[1]  =  0.46465633;
       a[2]	=  1.65755662;  a[3]  = -0.63203157;
@@ -161,7 +110,17 @@ void activationFunction( ){
       }
 
       vdExp( 4, a, y );
+  
       cout << "Y is " << endl;
       printMatrix( y , 2 , 2);
+
+      //compute activation!
+      for (int i = 0; i < (2*2); i++) {
+	    Z[i] = 1/( 1 + y[i]);
+      }
+
+      cout << "V is " << endl;
+      printMatrix( Z , 2 , 2);
+
 }
-*/
+
