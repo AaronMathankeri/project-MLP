@@ -112,19 +112,19 @@ void activationFunction( double *a ){
 void errorFunction( double *targets, double *finalOutputs){
 
       cout << "Error function for training" << endl;
-      double * diff = (double *)mkl_malloc( NUM_SAMPLES * sizeof( double ), 64 );
+      double * diff = (double *)mkl_malloc( NUM_FEATURES * sizeof( double ), 64 );
       double res = 0.0;
       const int incx = 1;
       
-      for (int i = 0; i < (NUM_SAMPLES); i++) {
+      for (int i = 0; i < (NUM_FEATURES); i++) {
 	    diff[i] = (double)(0.0);
       }
 
       //subtract them!
-      vdSub( NUM_SAMPLES , targets , finalOutputs, diff);
+      vdSub( NUM_FEATURES , targets , finalOutputs, diff);
 
       //get norm
-      res = dnrm2( &(NUM_SAMPLES), diff, &incx);
+      res = dnrm2( &(NUM_FEATURES), diff, &incx);
 
       //get norm squared
       res *= res;
