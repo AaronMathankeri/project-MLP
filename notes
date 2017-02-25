@@ -19,3 +19,9 @@ for now, hard code values from first 10 elements in python src!
 ==========
 Thu Feb 23 19:36:58 CST 2017
 alright, took care of all the I/O. Now time for the actual ML!
+
+==========
+Sat Feb 25 17:03:50 CST 2017
+scaling everythin back. getting confused with the number of samples.
+For now, 2d input array, 1d target vector. getting it working and
+then worry about all the book keeping.
