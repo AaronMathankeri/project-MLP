@@ -25,3 +25,8 @@ Sat Feb 25 17:03:50 CST 2017
 scaling everythin back. getting confused with the number of samples.
 For now, 2d input array, 1d target vector. getting it working and
 then worry about all the book keeping.
+
+==========
+Mon Feb 27 15:31:19 CST 2017
+Need to add "weight matrix". Weight Matrix will be randomly initialized,
+and values will be learned through backpropagation error.
