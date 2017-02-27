@@ -6,9 +6,7 @@ using namespace std;
 const int NUM_SAMPLES = 1;
 const int NUM_FEATURES = 2;
 
-void printArray( int array[] , int size);
 void printMatrix( double *Matrix , int rows, int cols );
-
 void initializeMatrix( double * Matrix, int rows, int columns );
 
 void activationFunction( double *a );
@@ -25,11 +23,18 @@ int main(int argc, char *argv[])
       cout << "Learning rate is " << EPSILON << endl;
       cout << "Regularizer strength is " << LAMBDA << endl;
       //--------------------------------------------------------------------
-      int targets[1] = {0};
+      double * targets = (double *)mkl_malloc( NUM_SAMPLES*sizeof( double ), 64 );
+      double * finalOutputs = (double *)mkl_malloc( NUM_SAMPLES*sizeof( double ), 64 );
 
       //set values
+      targets[0] = 0;
+      finalOutputs[0] = 1;
       cout << "targets are :" << endl;
-      printArray( targets , 1 );
+      printMatrix( targets, 1, NUM_SAMPLES);
+
+      cout << "finalOutputs are :" << endl;
+      printMatrix( finalOutputs, 1, NUM_SAMPLES);
+      errorFunction( targets , finalOutputs );
       //--------------------------------------------------------------------
       //double * features = (double *)mkl_malloc( NUM_SAMPLES* NUM_FEATURES*sizeof( double ), 64 );
       double * features = (double *)mkl_malloc( NUM_FEATURES*sizeof( double ), 64 );
@@ -46,15 +51,6 @@ int main(int argc, char *argv[])
       //--------------------------------------------------------------------
       //--------------------------------------------------------------------
       return 0;
-}
-
-void printArray( int array[] , int size){
-
-      for (int iter = 0; iter < size - 1; ++iter) 
-	    {
-		  cout << array[iter] << " , ";
-	    }
-      cout << array[(size - 1)] << endl;
 }
 
 void initializeMatrix( double * Matrix , int rows, int cols ){
