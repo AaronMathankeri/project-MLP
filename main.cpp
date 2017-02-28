@@ -7,6 +7,7 @@
 using namespace std;
 const int NUM_SAMPLES = 1;
 const int NUM_FEATURES = 2;
+const int NUM_HIDDEN_NODES = 3;
 
 void printMatrix( double *Matrix , int rows, int cols );
 void initializeMatrix( double * Matrix, int rows, int columns );
@@ -15,6 +16,7 @@ void initializeWeightMatrix( double * weightMatrix );
 void activationFunction( double *a );
 void errorFunction(double *t , double *y);
 double fRand(double fMin, double fMax);
+double getActivations( double * features, double * weightMatrix );
 
 int main(int argc, char *argv[])
 {
@@ -27,7 +29,7 @@ int main(int argc, char *argv[])
       //cout << "Regularizer strength is " << LAMBDA << endl;
       //--------------------------------------------------------------------
       double * features = (double *)mkl_malloc( NUM_FEATURES*sizeof( double ), 64 );
-      double * weightMatrix = (double *)mkl_malloc( NUM_FEATURES* NUM_FEATURES*sizeof( double ), 64 );
+      double * weightMatrix = (double *)mkl_malloc( NUM_HIDDEN_NODES* NUM_FEATURES*sizeof( double ), 64 );
       double * targets = (double *)mkl_malloc( NUM_SAMPLES*sizeof( double ), 64 );
       double * finalOutputs = (double *)mkl_malloc( NUM_SAMPLES*sizeof( double ), 64 );
 
@@ -51,13 +53,17 @@ int main(int argc, char *argv[])
       activationFunction( features );
       //--------------------------------------------------------------------
       srand(time(NULL)); //set seed
-      initializeMatrix( weightMatrix, NUM_FEATURES, NUM_FEATURES );
+      initializeMatrix( weightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
       initializeWeightMatrix( weightMatrix );
-      printMatrix( weightMatrix, NUM_FEATURES, NUM_FEATURES );
+      printMatrix( weightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
       //--------------------------------------------------------------------
-      
+      //1. get activations: a_j = \sum_i^D{w_ji * x_i + w_j0}
+      getActivations( features , weightMatrix );
       //--------------------------------------------------------------------
       return 0;
+}
+double getActivations( double * features, double * weightMatrix ){
+      cout << "Computing 1st layer" << endl;
 }
 
 void initializeMatrix( double * Matrix , int rows, int cols ){
@@ -68,7 +74,7 @@ void initializeMatrix( double * Matrix , int rows, int cols ){
 
 void initializeWeightMatrix( double * weightMatrix ){
       cout << "Random Initialization of Weight Matrix" << endl;
-      for (int iter = 0; iter < (NUM_FEATURES * NUM_FEATURES); ++iter) {
+      for (int iter = 0; iter < (NUM_HIDDEN_NODES * NUM_FEATURES); ++iter) {
 	    double temp = fRand( -10.0, 10.0);
 	    weightMatrix[iter] = temp;
       }
