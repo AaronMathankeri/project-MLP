@@ -17,6 +17,7 @@ double *activationFunction( double *a );
 void errorFunction(double *t , double *y);
 double fRand(double fMin, double fMax);
 double *getHiddenActivations( double * features, double * weightMatrix );
+double *getOutputActivations( double * features, double * weightMatrix );
 
 int main(int argc, char *argv[])
 {
@@ -31,16 +32,14 @@ int main(int argc, char *argv[])
       double * features = (double *)mkl_malloc( NUM_FEATURES*sizeof( double ), 64 );
       double * weightMatrix = (double *)mkl_malloc( NUM_HIDDEN_NODES* NUM_FEATURES*sizeof( double ), 64 );
       double * targets = (double *)mkl_malloc( NUM_SAMPLES*sizeof( double ), 64 );
-      double * finalOutputs = (double *)mkl_malloc( NUM_SAMPLES*sizeof( double ), 64 );
+      
 
       //set values
       targets[0] = 0;
-      finalOutputs[0] = 1;
       cout << "targets are :" << endl;
       printMatrix( targets, 1, NUM_SAMPLES);
 
-      //cout << "finalOutputs are :" << endl;
-      //printMatrix( finalOutputs, 1, NUM_SAMPLES);
+
       //test error function
       //errorFunction( targets , finalOutputs );
       //--------------------------------------------------------------------
@@ -64,7 +63,26 @@ int main(int argc, char *argv[])
       cout << "Non-linear transformation complete. Z is " << endl;
       printMatrix( z , 1 , NUM_HIDDEN_NODES);
       //--------------------------------------------------------------------
+      //compute final layer
+      getOutputActivations( z , weightMatrix );
+      //--------------------------------------------------------------------
       return 0;
+}
+double *getOutputActivations( double * z, double * weightMatrix ){
+      cout << "Computing final output" << endl;
+      double * finalOutputs = (double *)mkl_malloc( NUM_FEATURES*sizeof( double ), 64 );
+
+      cout << "finalOutputs are :" << endl;
+      initializeMatrix( finalOutputs, 1 , NUM_FEATURES );
+
+      // perform matrix vector multiplication: y = W*z
+      const double alpha = 1.0;
+      const double beta = 0.0;
+      const int incx = 1;
+      //cblas_dgemv( CblasRowMajor, CblasTrans, NUM_HIDDEN_NODES, NUM_FEATURES, alpha, weightMatrix, NUM_FEATURES, z, incx, beta, finalOutputs, incx);
+
+      printMatrix( finalOutputs, 1, NUM_SAMPLES);
+      return finalOutputs;
 }
 double *getHiddenActivations( double * features, double * weightMatrix ){
       cout << "Computing 1st layer" << endl;
