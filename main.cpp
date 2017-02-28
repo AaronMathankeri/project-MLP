@@ -17,10 +17,13 @@ void initializeWeightVector( float * weightVector );
 
 float *activationFunction( float *a );
 void errorFunction(float *t , float *y);
+void crossEntropyFunction( float *t, float *y );
+      //void crossEntropyFunction( float t, float y );
 float fRand(float fMin, float fMax);
 float *getHiddenActivations( float * features, float * firstLayerWeightMatrix );
 float *getOutputActivations( float * features, float * outputLayerWeightVector );
 
+void logisticSigmoid( float * finalOutputs );
 int main(int argc, char *argv[])
 {
       cout << " Creating a Simple Neural Net" << endl;
@@ -79,9 +82,22 @@ int main(int argc, char *argv[])
       printMatrix( finalOutputs, 1, NUM_OUTPUTS);
       //--------------------------------------------------------------------
       //test error function
-      errorFunction( targets , finalOutputs );
+      //errorFunction( targets , finalOutputs );
+      // take output and run it through sigmoid func!
+      logisticSigmoid( finalOutputs );
+      //test cross entropy function
+      crossEntropyFunction( targets , finalOutputs );
       //--------------------------------------------------------------------
       return 0;
+}
+void logisticSigmoid( float * finalOutputs ){
+      cout << "Transforming with sigmoid func" << endl;
+
+      //compute activation!
+      for (int i = 0; i < (NUM_OUTPUTS); i++) {
+	    finalOutputs[i] = 1/( 1 + exp(-finalOutputs[i]));
+      }
+      cout << "value is " << finalOutputs[0] << endl;
 }
 
 float *getOutputActivations( float * z, float * outputLayerWeightVector ){
@@ -193,6 +209,21 @@ void errorFunction( float *targets, float *finalOutputs){
       res = res * -1.0;
       cout << "Error = " << res << endl;
 }
+void crossEntropyFunction( float *t, float *y ){
+
+      cout << "Cross Entropy function for training" << endl;
+
+      float error = 0.0;
+
+      for (int iter = 0; iter < NUM_SAMPLES; ++iter){
+	    cout << "y is " << y[iter] << endl;
+	    cout << "t is " << t[iter] << endl;
+	    error += -(t[iter]*log(y[iter]) + (1 - t[iter])*log(1 - y[iter]));		  
+      }
+
+      cout << "entropy of system is " << error << endl;
+}
+
 //float * features = (float *)mkl_malloc( NUM_SAMPLES* NUM_FEATURES*sizeof( float ), 64 );
 //initializeMatrix( features, NUM_SAMPLES, NUM_FEATURES );
 
