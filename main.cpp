@@ -13,10 +13,10 @@ void printMatrix( double *Matrix , int rows, int cols );
 void initializeMatrix( double * Matrix, int rows, int columns );
 void initializeWeightMatrix( double * weightMatrix );
 
-void activationFunction( double *a );
+double *activationFunction( double *a );
 void errorFunction(double *t , double *y);
 double fRand(double fMin, double fMax);
-double *getActivations( double * features, double * weightMatrix );
+double *getHiddenActivations( double * features, double * weightMatrix );
 
 int main(int argc, char *argv[])
 {
@@ -55,16 +55,18 @@ int main(int argc, char *argv[])
       printMatrix( weightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
       //--------------------------------------------------------------------
       //1. get activations: a_j = \sum_i^D{w_ji * x_i + w_j0}
-      double *activations = getActivations( features , weightMatrix );
-      cout << "Activations are"<< endl;
+      double *activations = getHiddenActivations( features , weightMatrix );
+      cout << "Hidden activations are"<< endl;
       printMatrix( activations , 1 , NUM_HIDDEN_NODES );
       //--------------------------------------------------------------------
       //test activation function
-      //activationFunction( activations );
+      double *z = activationFunction( activations );
+      cout << "Non-linear transformation complete. Z is " << endl;
+      printMatrix( z , 1 , NUM_HIDDEN_NODES);
       //--------------------------------------------------------------------
       return 0;
 }
-double *getActivations( double * features, double * weightMatrix ){
+double *getHiddenActivations( double * features, double * weightMatrix ){
       cout << "Computing 1st layer" << endl;
       double * activations = (double *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( double ), 64 );
       initializeMatrix( activations, 1 , NUM_HIDDEN_NODES );
@@ -106,26 +108,24 @@ void printMatrix( double *Matrix , int rows, int cols ){
       }
 }
 
-void activationFunction( double *a ){
+double * activationFunction( double *a ){
       //sigma(a) = 1/(1 + exp(-a))
 
-      double * z = (double *)mkl_malloc( NUM_FEATURES * sizeof( double ), 64 );
-      initializeMatrix( z , 1 , NUM_FEATURES);
+      double * z = (double *)mkl_malloc( NUM_HIDDEN_NODES * sizeof( double ), 64 );
+      initializeMatrix( z , 1 , NUM_HIDDEN_NODES);
 
       //multiply by -1
-      for (int i = 0; i < (NUM_FEATURES); i++) {
+      for (int i = 0; i < (NUM_HIDDEN_NODES); i++) {
 	    a[i] = a[i] * (-1);
       }
 
-      vdExp( (NUM_FEATURES), a, a );
+      vdExp( (NUM_HIDDEN_NODES), a, a );
 
       //compute activation!
-      for (int i = 0; i < (NUM_FEATURES); i++) {
+      for (int i = 0; i < (NUM_HIDDEN_NODES); i++) {
 	    z[i] = 1/( 1 + a[i]);
       }
-
-      cout << "Non-linear transformation complete. Z is " << endl;
-      printMatrix( z , 1 , NUM_FEATURES);
+      return z;
 }
 
 void errorFunction( double *targets, double *finalOutputs){
