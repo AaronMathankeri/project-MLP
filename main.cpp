@@ -1,6 +1,8 @@
 #include <iostream>
 #include "mkl.h"
 #include "mathimf.h"
+#include <random>
+#include <cstdlib>
 
 using namespace std;
 const int NUM_SAMPLES = 1;
@@ -8,9 +10,11 @@ const int NUM_FEATURES = 2;
 
 void printMatrix( double *Matrix , int rows, int cols );
 void initializeMatrix( double * Matrix, int rows, int columns );
+void initializeWeightMatrix( double * weightMatrix );
 
 void activationFunction( double *a );
 void errorFunction(double *t , double *y);
+double fRand(double fMin, double fMax);
 
 int main(int argc, char *argv[])
 {
@@ -19,11 +23,11 @@ int main(int argc, char *argv[])
       //--------------------------------------------------------------------
       double EPSILON = 0.01; //learning rate
       double LAMBDA = 0.01;  //regularizer strength
-
-      cout << "Learning rate is " << EPSILON << endl;
-      cout << "Regularizer strength is " << LAMBDA << endl;
+      //cout << "Learning rate is " << EPSILON << endl;
+      //cout << "Regularizer strength is " << LAMBDA << endl;
       //--------------------------------------------------------------------
       double * features = (double *)mkl_malloc( NUM_FEATURES*sizeof( double ), 64 );
+      double * weightMatrix = (double *)mkl_malloc( NUM_FEATURES* NUM_FEATURES*sizeof( double ), 64 );
       double * targets = (double *)mkl_malloc( NUM_SAMPLES*sizeof( double ), 64 );
       double * finalOutputs = (double *)mkl_malloc( NUM_SAMPLES*sizeof( double ), 64 );
 
@@ -46,7 +50,12 @@ int main(int argc, char *argv[])
       //test activation function
       activationFunction( features );
       //--------------------------------------------------------------------
+      srand(time(NULL)); //set seed
+      initializeMatrix( weightMatrix, NUM_FEATURES, NUM_FEATURES );
+      initializeWeightMatrix( weightMatrix );
+      printMatrix( weightMatrix, NUM_FEATURES, NUM_FEATURES );
       //--------------------------------------------------------------------
+      
       //--------------------------------------------------------------------
       return 0;
 }
@@ -55,6 +64,19 @@ void initializeMatrix( double * Matrix , int rows, int cols ){
       for (int i = 0; i < (rows*cols); i++) {
 	    Matrix[i] = (double)(0.0);
       }
+}
+
+void initializeWeightMatrix( double * weightMatrix ){
+      cout << "Random Initialization of Weight Matrix" << endl;
+      for (int iter = 0; iter < (NUM_FEATURES * NUM_FEATURES); ++iter) {
+	    double temp = fRand( -10.0, 10.0);
+	    weightMatrix[iter] = temp;
+      }
+}
+
+double fRand(double fMin, double fMax){
+      double f = (double)rand() / RAND_MAX;
+      return fMin + f * (fMax - fMin);
 }
 
 void printMatrix( double *Matrix , int rows, int cols ){
