@@ -13,3 +13,9 @@ myFunc <- function( x ){
 a<- myFunc(x)
 
 a
+
+#------------
+# matrix vector multiplication
+myMatrix = matrix( c(2.27326 , 6.75528, -3.92609  ,  -5.75392,-6.13284   ,  5.29003) , nrow = 3, ncol =2, byrow = TRUE )
+myVector <-c(0.74346   ,  0.46466)
+myMatrix %*% myVector

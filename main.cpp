@@ -16,7 +16,7 @@ void initializeWeightMatrix( double * weightMatrix );
 void activationFunction( double *a );
 void errorFunction(double *t , double *y);
 double fRand(double fMin, double fMax);
-double getActivations( double * features, double * weightMatrix );
+double *getActivations( double * features, double * weightMatrix );
 
 int main(int argc, char *argv[])
 {
@@ -39,18 +39,15 @@ int main(int argc, char *argv[])
       cout << "targets are :" << endl;
       printMatrix( targets, 1, NUM_SAMPLES);
 
-      cout << "finalOutputs are :" << endl;
-      printMatrix( finalOutputs, 1, NUM_SAMPLES);
+      //cout << "finalOutputs are :" << endl;
+      //printMatrix( finalOutputs, 1, NUM_SAMPLES);
       //test error function
-      errorFunction( targets , finalOutputs );
+      //errorFunction( targets , finalOutputs );
       //--------------------------------------------------------------------
       //set features for now
       features[0]	=  0.74346118;  features[1]  =  0.46465633;
       cout << "Features are " << endl;
       printMatrix( features, 1, NUM_FEATURES );
-      //--------------------------------------------------------------------
-      //test activation function
-      activationFunction( features );
       //--------------------------------------------------------------------
       srand(time(NULL)); //set seed
       initializeMatrix( weightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
@@ -58,12 +55,27 @@ int main(int argc, char *argv[])
       printMatrix( weightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
       //--------------------------------------------------------------------
       //1. get activations: a_j = \sum_i^D{w_ji * x_i + w_j0}
-      getActivations( features , weightMatrix );
+      double *activations = getActivations( features , weightMatrix );
+      cout << "Activations are"<< endl;
+      printMatrix( activations , 1 , NUM_HIDDEN_NODES );
+      //--------------------------------------------------------------------
+      //test activation function
+      //activationFunction( activations );
       //--------------------------------------------------------------------
       return 0;
 }
-double getActivations( double * features, double * weightMatrix ){
+double *getActivations( double * features, double * weightMatrix ){
       cout << "Computing 1st layer" << endl;
+      double * activations = (double *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( double ), 64 );
+      initializeMatrix( activations, 1 , NUM_HIDDEN_NODES );
+
+      // perform matrix vector multiplication: a = W*x
+      const double alpha = 1.0;
+      const double beta = 0.0;
+      const int incx = 1;
+      cblas_dgemv( CblasRowMajor, CblasNoTrans, NUM_HIDDEN_NODES, NUM_FEATURES, alpha, weightMatrix, NUM_FEATURES, features, incx, beta, activations, incx);
+
+      return activations;
 }
 
 void initializeMatrix( double * Matrix , int rows, int cols ){
