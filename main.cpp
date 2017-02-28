@@ -10,31 +10,31 @@ const int NUM_FEATURES = 2;
 const int NUM_HIDDEN_NODES = 3;
 const int NUM_OUTPUTS = 1;
 
-void printMatrix( double *Matrix , int rows, int cols );
-void initializeMatrix( double * Matrix, int rows, int columns );
-void initializeWeightMatrix( double * weightMatrix );
-void initializeWeightVector( double * weightVector );
+void printMatrix( float *Matrix , int rows, int cols );
+void initializeMatrix( float * Matrix, int rows, int columns );
+void initializeWeightMatrix( float * weightMatrix );
+void initializeWeightVector( float * weightVector );
 
-double *activationFunction( double *a );
-void errorFunction(double *t , double *y);
-double fRand(double fMin, double fMax);
-double *getHiddenActivations( double * features, double * firstLayerWeightMatrix );
-double *getOutputActivations( double * features, double * outputLayerWeightVector );
+float *activationFunction( float *a );
+void errorFunction(float *t , float *y);
+float fRand(float fMin, float fMax);
+float *getHiddenActivations( float * features, float * firstLayerWeightMatrix );
+float *getOutputActivations( float * features, float * outputLayerWeightVector );
 
 int main(int argc, char *argv[])
 {
       cout << " Creating a Simple Neural Net" << endl;
 
       //--------------------------------------------------------------------
-      double EPSILON = 0.01; //learning rate
-      double LAMBDA = 0.01;  //regularizer strength
+      float EPSILON = 0.01; //learning rate
+      float LAMBDA = 0.01;  //regularizer strength
       //cout << "Learning rate is " << EPSILON << endl;
       //cout << "Regularizer strength is " << LAMBDA << endl;
       //--------------------------------------------------------------------
-      double * features = (double *)mkl_malloc( NUM_FEATURES*sizeof( double ), 64 );
-      double * firstLayerWeightMatrix = (double *)mkl_malloc( NUM_HIDDEN_NODES* NUM_FEATURES *sizeof( double ), 64 );
-      double * outputLayerWeightVector = (double *)mkl_malloc( NUM_OUTPUTS*NUM_HIDDEN_NODES* sizeof( double ), 64 );
-      double * targets = (double *)mkl_malloc( NUM_SAMPLES*sizeof( double ), 64 );
+      float * features = (float *)mkl_malloc( NUM_FEATURES*sizeof( float ), 64 );
+      float * firstLayerWeightMatrix = (float *)mkl_malloc( NUM_HIDDEN_NODES* NUM_FEATURES *sizeof( float ), 64 );
+      float * outputLayerWeightVector = (float *)mkl_malloc( NUM_OUTPUTS*NUM_HIDDEN_NODES* sizeof( float ), 64 );
+      float * targets = (float *)mkl_malloc( NUM_SAMPLES*sizeof( float ), 64 );
       
       //hard-code some values
       features[0] = 0.74346118;
@@ -62,19 +62,19 @@ int main(int argc, char *argv[])
 
       //--------------------------------------------------------------------
       //1. get activations: a_j = \sum_i^D{w_ji * x_i + w_j0}
-      double *activations = getHiddenActivations( features , firstLayerWeightMatrix );
+      float *activations = getHiddenActivations( features , firstLayerWeightMatrix );
       cout << "Hidden activations are"<< endl;
       printMatrix( activations , 1 , NUM_HIDDEN_NODES );
       //--------------------------------------------------------------------
 
       //2. transform with logistic sigmoid
-      double *z = activationFunction( activations );
+      float *z = activationFunction( activations );
       cout << "Non-linear transformation complete. Z is " << endl;
       printMatrix( z , 1 , NUM_HIDDEN_NODES);
       //--------------------------------------------------------------------
 
       //compute final layer
-      double *finalOutputs = getOutputActivations( z , outputLayerWeightVector );
+      float *finalOutputs = getOutputActivations( z , outputLayerWeightVector );
       cout << "finalOutputs are :" << endl;
       printMatrix( finalOutputs, 1, NUM_OUTPUTS);
       //--------------------------------------------------------------------
@@ -84,63 +84,64 @@ int main(int argc, char *argv[])
       return 0;
 }
 
-double *getOutputActivations( double * z, double * outputLayerWeightVector ){
+float *getOutputActivations( float * z, float * outputLayerWeightVector ){
       cout << "Computing final output" << endl;
-      double * finalOutputs = (double *)mkl_malloc( NUM_OUTPUTS*sizeof( double ), 64 );
+      float * finalOutputs = (float *)mkl_malloc( NUM_OUTPUTS*sizeof( float ), 64 );
 
       initializeMatrix( finalOutputs, 1 , NUM_OUTPUTS );
       // perform matrix vector multiplication: y = W*z
-      const double alpha = 1.0;
-      const double beta = 0.0;
+      const float alpha = 1.0;
+      const float beta = 0.0;
       const int incx = 1;
       //cblas_dgemv( CblasRowMajor, CblasTrans, NUM_OUTPUTS, NUM_HIDDEN_NODES, alpha, outputLayerWeightVector, NUM_HIDDEN_NODES, z, incx, beta, finalOutputs, incx);
-      double res = 0.0;
-      res = cblas_ddot( NUM_HIDDEN_NODES, z,incx, outputLayerWeightVector, incx);
+      float res = 0.0;
+      res = cblas_sdot( NUM_HIDDEN_NODES, z,incx, outputLayerWeightVector, incx);
 
       finalOutputs[0] = res;
       return finalOutputs;
 }
-double *getHiddenActivations( double * features, double * weightMatrix ){
+float *getHiddenActivations( float * features, float * weightMatrix ){
       cout << "Computing 1st layer" << endl;
-      double * activations = (double *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( double ), 64 );
+      float * activations = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
       initializeMatrix( activations, 1 , NUM_HIDDEN_NODES );
 
       // perform matrix vector multiplication: a = W*x
-      const double alpha = 1.0;
-      const double beta = 0.0;
+      const float alpha = 1.0;
+      const float beta = 0.0;
       const int incx = 1;
-      cblas_dgemv( CblasRowMajor, CblasNoTrans, NUM_HIDDEN_NODES, NUM_FEATURES, alpha, weightMatrix, NUM_FEATURES, features, incx, beta, activations, incx);
+      cblas_sgemv( CblasRowMajor, CblasNoTrans, NUM_HIDDEN_NODES, NUM_FEATURES,
+		   alpha, weightMatrix, NUM_FEATURES, features, incx, beta, activations, incx);
 
       return activations;
 }
 
-void initializeMatrix( double * Matrix , int rows, int cols ){
+void initializeMatrix( float * Matrix , int rows, int cols ){
       for (int i = 0; i < (rows*cols); i++) {
-	    Matrix[i] = (double)(0.0);
+	    Matrix[i] = (float)(0.0);
       }
 }
 
-void initializeWeightMatrix( double * weightMatrix ){
+void initializeWeightMatrix( float * weightMatrix ){
       cout << "Random Initialization of Weight Matrix" << endl;
       for (int iter = 0; iter < (NUM_HIDDEN_NODES * NUM_FEATURES); ++iter) {
-	    double temp = fRand( -10.0, 10.0);
+	    float temp = fRand( -10.0, 10.0);
 	    weightMatrix[iter] = temp;
       }
 }
-void initializeWeightVector( double * weightVector ){
+void initializeWeightVector( float * weightVector ){
       cout << "Random Initialization of Weight Matrix" << endl;
       for (int iter = 0; iter < (NUM_HIDDEN_NODES); ++iter) {
-	    double temp = fRand( -10.0, 10.0);
+	    float temp = fRand( -10.0, 10.0);
 	    weightVector[iter] = temp;
       }
 }
 
-double fRand(double fMin, double fMax){
-      double f = (double)rand() / RAND_MAX;
+float fRand(float fMin, float fMax){
+      float f = (float)rand() / RAND_MAX;
       return fMin + f * (fMax - fMin);
 }
 
-void printMatrix( double *Matrix , int rows, int cols ){
+void printMatrix( float *Matrix , int rows, int cols ){
       for ( int i = 0; i < rows ; i++) {
 	    for ( int j = 0; j < cols ; j++) {
 		  printf ("%12.5f", Matrix[i*cols + j]);
@@ -149,10 +150,10 @@ void printMatrix( double *Matrix , int rows, int cols ){
       }
 }
 
-double * activationFunction( double *a ){
+float * activationFunction( float *a ){
       //sigma(a) = 1/(1 + exp(-a))
 
-      double * z = (double *)mkl_malloc( NUM_HIDDEN_NODES * sizeof( double ), 64 );
+      float * z = (float *)mkl_malloc( NUM_HIDDEN_NODES * sizeof( float ), 64 );
       initializeMatrix( z , 1 , NUM_HIDDEN_NODES);
 
       //multiply by -1
@@ -160,7 +161,7 @@ double * activationFunction( double *a ){
 	    a[i] = a[i] * (-1);
       }
 
-      vdExp( (NUM_HIDDEN_NODES), a, a );
+      vsExp( (NUM_HIDDEN_NODES), a, a );
 
       //compute activation!
       for (int i = 0; i < (NUM_HIDDEN_NODES); i++) {
@@ -169,29 +170,29 @@ double * activationFunction( double *a ){
       return z;
 }
 
-void errorFunction( double *targets, double *finalOutputs){
+void errorFunction( float *targets, float *finalOutputs){
 
       cout << "Error function for training" << endl;
-      double * diff = (double *)mkl_malloc( NUM_SAMPLES * sizeof( double ), 64 );
-      double res = 0.0;
+      float * diff = (float *)mkl_malloc( NUM_SAMPLES * sizeof( float ), 64 );
+      float res = 0.0;
       const int incx = 1;
       
       for (int i = 0; i < (NUM_SAMPLES); i++) {
-	    diff[i] = (double)(0.0);
+	    diff[i] = (float)(0.0);
       }
 
       //subtract them!
-      vdSub( NUM_SAMPLES , targets , finalOutputs, diff);
+      vsSub( NUM_SAMPLES , targets , finalOutputs, diff);
 
       //get norm
-      res = dnrm2( &(NUM_SAMPLES), diff, &incx);
+      res = snrm2( &(NUM_SAMPLES), diff, &incx);
 
       //get norm squared
       res *= res;
 
       cout << "Error = " << res << endl;
 }
-//double * features = (double *)mkl_malloc( NUM_SAMPLES* NUM_FEATURES*sizeof( double ), 64 );
+//float * features = (float *)mkl_malloc( NUM_SAMPLES* NUM_FEATURES*sizeof( float ), 64 );
 //initializeMatrix( features, NUM_SAMPLES, NUM_FEATURES );
 
 /*
