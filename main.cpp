@@ -21,8 +21,6 @@ double fRand(double fMin, double fMax);
 double *getHiddenActivations( double * features, double * firstLayerWeightMatrix );
 double *getOutputActivations( double * features, double * outputLayerWeightVector );
 
-double *logisticSigmoid( double *a);
-
 int main(int argc, char *argv[])
 {
       cout << " Creating a Simple Neural Net" << endl;
@@ -84,10 +82,6 @@ int main(int argc, char *argv[])
       errorFunction( targets , finalOutputs );
       //--------------------------------------------------------------------
       return 0;
-}
-double *logisticSigmoid( double *a){
-      cout << "Transfer Function" << endl;
-      double* myOutput;
 }
 
 double *getOutputActivations( double * z, double * outputLayerWeightVector ){
