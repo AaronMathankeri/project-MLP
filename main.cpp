@@ -1,10 +1,9 @@
 #include <iostream>
 #include "mkl.h"
 #include "mathimf.h"
-#include <random>
-#include <cstdlib>
 
 using namespace std;
+
 const int NUM_SAMPLES = 1;
 const int NUM_FEATURES = 2;
 const int NUM_HIDDEN_NODES = 3;
