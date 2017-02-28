@@ -31,8 +31,8 @@ int main(int argc, char *argv[])
       //cout << "Regularizer strength is " << LAMBDA << endl;
       //--------------------------------------------------------------------
       double * features = (double *)mkl_malloc( NUM_FEATURES*sizeof( double ), 64 );
-      double * firstLayerWeightMatrix = (double *)mkl_malloc( NUM_FEATURES * NUM_HIDDEN_NODES*sizeof( double ), 64 );
-      double * outputLayerWeightMatrix = (double *)mkl_malloc( NUM_HIDDEN_NODES* NUM_OUTPUTS*sizeof( double ), 64 );
+      double * firstLayerWeightMatrix = (double *)mkl_malloc( NUM_HIDDEN_NODES* NUM_FEATURES *sizeof( double ), 64 );
+      double * outputLayerWeightMatrix = (double *)mkl_malloc( NUM_OUTPUTS*NUM_HIDDEN_NODES* sizeof( double ), 64 );
       double * targets = (double *)mkl_malloc( NUM_SAMPLES*sizeof( double ), 64 );
       
       //hard-code some values
@@ -45,49 +45,51 @@ int main(int argc, char *argv[])
 
       cout << "targets are :" << endl;
       printMatrix( targets, 1, NUM_SAMPLES);
-
-      //test error function
-      //errorFunction( targets , finalOutputs );
       //--------------------------------------------------------------------
-      //set features for now
-      /*
-      //--------------------------------------------------------------------
+      // randomly initialize weight matrices
       srand(time(NULL)); //set seed
-      initializeMatrix( weightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
-      initializeWeightMatrix( weightMatrix );
-      printMatrix( weightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
+      initializeMatrix( firstLayerWeightMatrix,  NUM_HIDDEN_NODES, NUM_FEATURES );
+      initializeMatrix( outputLayerWeightMatrix, NUM_OUTPUTS, NUM_HIDDEN_NODES );
+      initializeWeightMatrix( firstLayerWeightMatrix );
+      initializeWeightMatrix( outputLayerWeightMatrix );
+
+      cout << "1st layer Weight Matrix" << endl;
+      printMatrix( firstLayerWeightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
+      cout << "Output layer Weight Matrix" << endl;
+      printMatrix( outputLayerWeightMatrix, NUM_OUTPUTS, NUM_HIDDEN_NODES );
+      //--------------------------------------------------------------------
 
       //--------------------------------------------------------------------
       //1. get activations: a_j = \sum_i^D{w_ji * x_i + w_j0}
-      double *activations = getHiddenActivations( features , weightMatrix );
+      double *activations = getHiddenActivations( features , firstLayerWeightMatrix );
       cout << "Hidden activations are"<< endl;
       printMatrix( activations , 1 , NUM_HIDDEN_NODES );
       //--------------------------------------------------------------------
-      //test activation function
+      //2. transform with logistic sigmoid
       double *z = activationFunction( activations );
       cout << "Non-linear transformation complete. Z is " << endl;
       printMatrix( z , 1 , NUM_HIDDEN_NODES);
       //--------------------------------------------------------------------
       //compute final layer
-      getOutputActivations( z , weightMatrix );
+      double *finalOutputs = getOutputActivations( z , outputLayerWeightMatrix );
+      cout << "finalOutputs are :" << endl;
+      printMatrix( finalOutputs, 1, NUM_OUTPUTS);
       //--------------------------------------------------------------------
-      */
+      //test error function
+      //errorFunction( targets , finalOutputs );
       return 0;
 }
-double *getOutputActivations( double * z, double * weightMatrix ){
+double *getOutputActivations( double * z, double * outputLayerWeightMatrix ){
       cout << "Computing final output" << endl;
-      double * finalOutputs = (double *)mkl_malloc( NUM_FEATURES*sizeof( double ), 64 );
+      double * finalOutputs = (double *)mkl_malloc( NUM_OUTPUTS*sizeof( double ), 64 );
 
-      cout << "finalOutputs are :" << endl;
-      initializeMatrix( finalOutputs, 1 , NUM_FEATURES );
-
+      initializeMatrix( finalOutputs, 1 , NUM_OUTPUTS );
       // perform matrix vector multiplication: y = W*z
       const double alpha = 1.0;
       const double beta = 0.0;
       const int incx = 1;
-      //cblas_dgemv( CblasRowMajor, CblasTrans, NUM_HIDDEN_NODES, NUM_FEATURES, alpha, weightMatrix, NUM_FEATURES, z, incx, beta, finalOutputs, incx);
+      cblas_dgemv( CblasRowMajor, CblasTrans, NUM_OUTPUTS, NUM_HIDDEN_NODES, alpha, outputLayerWeightMatrix, NUM_HIDDEN_NODES, z, incx, beta, finalOutputs, incx);
 
-      printMatrix( finalOutputs, 1, NUM_SAMPLES);
       return finalOutputs;
 }
 double *getHiddenActivations( double * features, double * weightMatrix ){
