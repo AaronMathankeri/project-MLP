@@ -8,17 +8,20 @@ using namespace std;
 const int NUM_SAMPLES = 1;
 const int NUM_FEATURES = 2;
 const int NUM_HIDDEN_NODES = 3;
-const int NUM_OUTPUTS = 2;
+const int NUM_OUTPUTS = 1;
 
 void printMatrix( double *Matrix , int rows, int cols );
 void initializeMatrix( double * Matrix, int rows, int columns );
 void initializeWeightMatrix( double * weightMatrix );
+void initializeWeightVector( double * weightVector );
 
 double *activationFunction( double *a );
 void errorFunction(double *t , double *y);
 double fRand(double fMin, double fMax);
 double *getHiddenActivations( double * features, double * firstLayerWeightMatrix );
-double *getOutputActivations( double * features, double * outputLayerWeightMatrix );
+double *getOutputActivations( double * features, double * outputLayerWeightVector );
+
+double *logisticSigmoid( double *a);
 
 int main(int argc, char *argv[])
 {
@@ -32,7 +35,7 @@ int main(int argc, char *argv[])
       //--------------------------------------------------------------------
       double * features = (double *)mkl_malloc( NUM_FEATURES*sizeof( double ), 64 );
       double * firstLayerWeightMatrix = (double *)mkl_malloc( NUM_HIDDEN_NODES* NUM_FEATURES *sizeof( double ), 64 );
-      double * outputLayerWeightMatrix = (double *)mkl_malloc( NUM_OUTPUTS*NUM_HIDDEN_NODES* sizeof( double ), 64 );
+      double * outputLayerWeightVector = (double *)mkl_malloc( NUM_OUTPUTS*NUM_HIDDEN_NODES* sizeof( double ), 64 );
       double * targets = (double *)mkl_malloc( NUM_SAMPLES*sizeof( double ), 64 );
       
       //hard-code some values
@@ -49,14 +52,14 @@ int main(int argc, char *argv[])
       // randomly initialize weight matrices
       srand(time(NULL)); //set seed
       initializeMatrix( firstLayerWeightMatrix,  NUM_HIDDEN_NODES, NUM_FEATURES );
-      initializeMatrix( outputLayerWeightMatrix, NUM_OUTPUTS, NUM_HIDDEN_NODES );
+      initializeMatrix( outputLayerWeightVector, NUM_OUTPUTS, NUM_HIDDEN_NODES );
       initializeWeightMatrix( firstLayerWeightMatrix );
-      initializeWeightMatrix( outputLayerWeightMatrix );
+      initializeWeightVector( outputLayerWeightVector );
 
       cout << "1st layer Weight Matrix" << endl;
       printMatrix( firstLayerWeightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
       cout << "Output layer Weight Matrix" << endl;
-      printMatrix( outputLayerWeightMatrix, NUM_OUTPUTS, NUM_HIDDEN_NODES );
+      printMatrix( outputLayerWeightVector, NUM_OUTPUTS, NUM_HIDDEN_NODES );
       //--------------------------------------------------------------------
 
       //--------------------------------------------------------------------
@@ -65,21 +68,29 @@ int main(int argc, char *argv[])
       cout << "Hidden activations are"<< endl;
       printMatrix( activations , 1 , NUM_HIDDEN_NODES );
       //--------------------------------------------------------------------
+
       //2. transform with logistic sigmoid
       double *z = activationFunction( activations );
       cout << "Non-linear transformation complete. Z is " << endl;
       printMatrix( z , 1 , NUM_HIDDEN_NODES);
       //--------------------------------------------------------------------
+
       //compute final layer
-      double *finalOutputs = getOutputActivations( z , outputLayerWeightMatrix );
+      double *finalOutputs = getOutputActivations( z , outputLayerWeightVector );
       cout << "finalOutputs are :" << endl;
       printMatrix( finalOutputs, 1, NUM_OUTPUTS);
       //--------------------------------------------------------------------
       //test error function
-      //errorFunction( targets , finalOutputs );
+      errorFunction( targets , finalOutputs );
+      //--------------------------------------------------------------------
       return 0;
 }
-double *getOutputActivations( double * z, double * outputLayerWeightMatrix ){
+double *logisticSigmoid( double *a){
+      cout << "Transfer Function" << endl;
+      double* myOutput;
+}
+
+double *getOutputActivations( double * z, double * outputLayerWeightVector ){
       cout << "Computing final output" << endl;
       double * finalOutputs = (double *)mkl_malloc( NUM_OUTPUTS*sizeof( double ), 64 );
 
@@ -88,8 +99,11 @@ double *getOutputActivations( double * z, double * outputLayerWeightMatrix ){
       const double alpha = 1.0;
       const double beta = 0.0;
       const int incx = 1;
-      cblas_dgemv( CblasRowMajor, CblasTrans, NUM_OUTPUTS, NUM_HIDDEN_NODES, alpha, outputLayerWeightMatrix, NUM_HIDDEN_NODES, z, incx, beta, finalOutputs, incx);
+      //cblas_dgemv( CblasRowMajor, CblasTrans, NUM_OUTPUTS, NUM_HIDDEN_NODES, alpha, outputLayerWeightVector, NUM_HIDDEN_NODES, z, incx, beta, finalOutputs, incx);
+      double res = 0.0;
+      res = cblas_ddot( NUM_HIDDEN_NODES, z,incx, outputLayerWeightVector, incx);
 
+      finalOutputs[0] = res;
       return finalOutputs;
 }
 double *getHiddenActivations( double * features, double * weightMatrix ){
@@ -117,6 +131,13 @@ void initializeWeightMatrix( double * weightMatrix ){
       for (int iter = 0; iter < (NUM_HIDDEN_NODES * NUM_FEATURES); ++iter) {
 	    double temp = fRand( -10.0, 10.0);
 	    weightMatrix[iter] = temp;
+      }
+}
+void initializeWeightVector( double * weightVector ){
+      cout << "Random Initialization of Weight Matrix" << endl;
+      for (int iter = 0; iter < (NUM_HIDDEN_NODES); ++iter) {
+	    double temp = fRand( -10.0, 10.0);
+	    weightVector[iter] = temp;
       }
 }
 

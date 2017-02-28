@@ -30,3 +30,10 @@ then worry about all the book keeping.
 Mon Feb 27 15:31:19 CST 2017
 Need to add "weight matrix". Weight Matrix will be randomly initialized,
 and values will be learned through backpropagation error.
+
+==========
+Tue Feb 28 13:11:44 CST 2017
+For this toy example, there is only 1 output. This means that
+the error function will be replaced by the cross entropy error
+AND
+"weight matrix" for the second layer is a vector!
