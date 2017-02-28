@@ -189,7 +189,8 @@ void errorFunction( float *targets, float *finalOutputs){
 
       //get norm squared
       res *= res;
-
+      //multiply by -1.0
+      res = res * -1.0;
       cout << "Error = " << res << endl;
 }
 //float * features = (float *)mkl_malloc( NUM_SAMPLES* NUM_FEATURES*sizeof( float ), 64 );
