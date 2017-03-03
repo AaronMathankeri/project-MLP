@@ -138,16 +138,16 @@ void initializeMatrix( float * Matrix , int rows, int cols ){
 
 void initializeWeightMatrix( float * weightMatrix ){
       cout << "Random Initialization of Weight Matrix" << endl;
-      for (int iter = 0; iter < (NUM_HIDDEN_NODES * NUM_FEATURES); ++iter) {
+      for (int i = 0; i < (NUM_HIDDEN_NODES * NUM_FEATURES); ++i) {
 	    float temp = fRand( -10.0, 10.0);
-	    weightMatrix[iter] = temp;
+	    weightMatrix[i] = temp;
       }
 }
 void initializeWeightVector( float * weightVector ){
       cout << "Random Initialization of Weight Matrix" << endl;
-      for (int iter = 0; iter < (NUM_HIDDEN_NODES); ++iter) {
+      for (int i = 0; i < (NUM_HIDDEN_NODES); ++i) {
 	    float temp = fRand( -10.0, 10.0);
-	    weightVector[iter] = temp;
+	    weightVector[i] = temp;
       }
 }
 
@@ -214,10 +214,10 @@ void crossEntropyFunction( float *t, float *y ){
 
       float error = 0.0;
 
-      for (int iter = 0; iter < NUM_SAMPLES; ++iter){
-	    cout << "y is " << y[iter] << endl;
-	    cout << "t is " << t[iter] << endl;
-	    error += -(t[iter]*log(y[iter]) + (1 - t[iter])*log(1 - y[iter]));		  
+      for (int i = 0; i < NUM_SAMPLES; ++i){
+	    cout << "y is " << y[i] << endl;
+	    cout << "t is " << t[i] << endl;
+	    error += -(t[i]*log(y[i]) + (1 - t[i])*log(1 - y[i]));		  
       }
 
       cout << "entropy of system is " << error << endl;
