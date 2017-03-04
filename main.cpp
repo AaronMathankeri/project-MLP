@@ -9,10 +9,16 @@ const int NUM_FEATURES = 2;
 const int NUM_HIDDEN_NODES = 3;
 const int NUM_OUTPUTS = 1;
 
-
 //-----------------------------------------------------
 //I-O functions
-void printMatrix( float *Matrix , int rows, int cols );
+void printMatrix( float *Matrix , int nRows, int nCols ){
+      for ( int i = 0; i < nRows ; i++) {
+	    for ( int j = 0; j < nCols ; j++) {
+		  printf ("%12.5f", Matrix[i*nCols + j]);
+	    }
+	    printf ("\n");
+      }
+}
 //-----------------------------------------------------
 //initialize to avoid memory errors
 void initializeMatrix( float * Matrix, int rows, int columns ){
@@ -35,22 +41,26 @@ float crossEntropyFunction( float *t, float *y ){
       for (int i = 0; i < NUM_SAMPLES; ++i){
 	    entropy += -(t[i]*log(y[i]) + (1 - t[i])*log(1 - y[i]));		  
       }
-      //      cout << "entropy of system is " << entropy << endl;
       return entropy;
 }
-
-void errorFunction(float *t , float *y);
-//void crossEntropyFunction( float *t, float *y );
+void logisticSigmoid( float * a , float *sigma){
+      //sigma(a) = 1/(1 + exp(-a))
+      for (int i = 0; i < (NUM_OUTPUTS); i++) {
+	    sigma[i] = 1/( 1 + exp(-a[i]));
+      }
+}
+void dlogisticSigmoid( float * a , float * sigmaPrime){
+      //d/da sigma(a) = sigma(a) * [1 - sigma(a)]
+      logisticSigmoid(a, sigmaPrime);
+      for (int i = 0; i < (NUM_OUTPUTS); ++i) {
+	    sigmaPrime[i] = sigmaPrime[i]*(1 - sigmaPrime[i] );
+      }
+}
 //-----------------------------------------------------
 //-----------------------------------------------------
 float *activationFunction( float *a );
-
-float fRand(float fMin, float fMax);
 float *getHiddenActivations( float * x, float * firstLayerWeightMatrix );
 float *getOutputActivations( float * x, float * secondLayerWeightVector );
-
-void logisticSigmoid( float * finalOutputs );
-void dlogisticSigmoid( float * a );
 
 int main(int argc, char *argv[])
 {
@@ -69,9 +79,9 @@ int main(int argc, char *argv[])
 
       //hard-code some values
       x[0] = 0.74346118;
-      x[1] =  0.46465633;
+      x[1] = 0.46465633;
 
-      t[0] = 0;
+      t[0] = 0.0;
 
       cout << "Features are " << endl;
       printMatrix( x, 1, NUM_FEATURES );
@@ -98,8 +108,20 @@ int main(int argc, char *argv[])
       y[0] = 0.5;
       cout << "Entropy of system is " << crossEntropyFunction( t , y ) << "\n";
 
+      float * test = (float *)mkl_malloc( NUM_SAMPLES*sizeof( float ), 64 );
+      initializeMatrix( test, 1 , NUM_SAMPLES);
+	    
+      logisticSigmoid( t, test );
+      cout <<"Input of sigmoid " << t[0] << "\n";
+      cout <<"Output of Logistic Sigmoid is " << test[0] << "\n";
+      initializeMatrix( test, 1 , NUM_SAMPLES);
+      dlogisticSigmoid( t, test );
+      cout <<"Input of dSigmoid " << t[0] << "\n";
+      cout <<"Output of dLogistic Sigmoid is " << test[0] << "\n";
+
       exit( -1 );
       //--------------------------------------------------------------------
+      /*
       //1. get activations: a_j = \sum_i^D{w_ji * x_i + w_j0}
       float *activations = getHiddenActivations( x , firstLayerWeightMatrix );
       cout << "Hidden activations are"<< endl;
@@ -120,34 +142,16 @@ int main(int argc, char *argv[])
       //test error function
       //errorFunction( t , finalOutputs );
       // take output and run it through sigmoid func!
-      logisticSigmoid( finalOutputs );
+      //logisticSigmoid( finalOutputs );
       //--------------------------------------------------------------------
       //get derivative of sigmoid!
-      dlogisticSigmoid( finalOutputs );
+      //dlogisticSigmoid( finalOutputs );
+      */
       return 0;
 }
-void logisticSigmoid( float * finalOutputs ){
-      cout << "Transforming with sigmoid func" << endl;
 
-      //compute activation!
-      for (int i = 0; i < (NUM_OUTPUTS); i++) {
-	    finalOutputs[i] = 1/( 1 + exp(-finalOutputs[i]));
-      }
-      cout << "value is " << finalOutputs[0] << endl;
-}
 
-void dlogisticSigmoid( float * a ){
-      //d/da sigma(a) = sigma(a) * [1 - sigma(a)]
-      cout << "calculating derivative of Logistic Sigmoid" << "\n";
 
-      double sigma = 0.0;
-
-      //sigma = logisticSigmoid( a );
-
-      sigma = sigma * (1 - sigma);
-
-      cout << "sigma is" << sigma << "\n";
-}
 float *getOutputActivations( float * z, float * secondLayerWeightVector ){
       cout << "Computing final output" << endl;
       float * finalOutputs = (float *)mkl_malloc( NUM_OUTPUTS*sizeof( float ), 64 );
@@ -180,14 +184,6 @@ float *getHiddenActivations( float * x, float * weightMatrix ){
 }
 
 
-void printMatrix( float *Matrix , int rows, int cols ){
-      for ( int i = 0; i < rows ; i++) {
-	    for ( int j = 0; j < cols ; j++) {
-		  printf ("%12.5f", Matrix[i*cols + j]);
-	    }
-	    printf ("\n");
-      }
-}
 
 float * activationFunction( float *a ){
       //sigma(a) = 1/(1 + exp(-a))
