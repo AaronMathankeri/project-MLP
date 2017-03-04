@@ -42,3 +42,8 @@ AND
 Sat Mar 04 08:58:43 CST 2017
 Now that topology is set, how to iteratively train the network for the best
 parameters?
+
+==========
+Sat Mar 04 16:41:21 CST 2017
+getting hard creating algorithms to match literature. I'm going to do
+a full re-write to match notation from PRML by Bishop

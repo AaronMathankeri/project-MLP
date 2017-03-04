@@ -9,65 +9,99 @@ const int NUM_FEATURES = 2;
 const int NUM_HIDDEN_NODES = 3;
 const int NUM_OUTPUTS = 1;
 
-void printMatrix( float *Matrix , int rows, int cols );
-void initializeMatrix( float * Matrix, int rows, int columns );
-void initializeWeightMatrix( float * weightMatrix );
-void initializeWeightVector( float * weightVector );
 
-float *activationFunction( float *a );
+//-----------------------------------------------------
+//I-O functions
+void printMatrix( float *Matrix , int rows, int cols );
+//-----------------------------------------------------
+//initialize to avoid memory errors
+void initializeMatrix( float * Matrix, int rows, int columns ){
+      memset( Matrix, 0.0,  rows*columns * sizeof(double));      
+}
+float fRand(float fMin, float fMax){
+      float f = (float)rand() / RAND_MAX;
+      return fMin + f * (fMax - fMin);
+}
+void setRandomWeights( float * weights, int nRows, int nCols ){
+      for (int i = 0; i < (nRows*nCols); ++i) {
+	    float temp = fRand( -10.0, 10.0);
+	    weights[i] = temp;
+      }
+}
+//-----------------------------------------------------
+// MLP network Independent functions
+float crossEntropyFunction( float *t, float *y ){
+      float entropy = 0.0;
+      for (int i = 0; i < NUM_SAMPLES; ++i){
+	    entropy += -(t[i]*log(y[i]) + (1 - t[i])*log(1 - y[i]));		  
+      }
+      //      cout << "entropy of system is " << entropy << endl;
+      return entropy;
+}
+
 void errorFunction(float *t , float *y);
-void crossEntropyFunction( float *t, float *y );
-      //void crossEntropyFunction( float t, float y );
+//void crossEntropyFunction( float *t, float *y );
+//-----------------------------------------------------
+//-----------------------------------------------------
+float *activationFunction( float *a );
+
 float fRand(float fMin, float fMax);
-float *getHiddenActivations( float * features, float * firstLayerWeightMatrix );
-float *getOutputActivations( float * features, float * outputLayerWeightVector );
+float *getHiddenActivations( float * x, float * firstLayerWeightMatrix );
+float *getOutputActivations( float * x, float * secondLayerWeightVector );
 
 void logisticSigmoid( float * finalOutputs );
 void dlogisticSigmoid( float * a );
-
 
 int main(int argc, char *argv[])
 {
       cout << " Creating a Simple Neural Net" << endl;
 
       //--------------------------------------------------------------------
-      float EPSILON = 0.01; //learning rate
-      float LAMBDA = 0.01;  //regularizer strength
-      //cout << "Learning rate is " << EPSILON << endl;
-      //cout << "Regularizer strength is " << LAMBDA << endl;
-      //--------------------------------------------------------------------
-      float * features = (float *)mkl_malloc( NUM_FEATURES*sizeof( float ), 64 );
+      float * x = (float *)mkl_malloc( NUM_FEATURES*sizeof( float ), 64 );
       float * firstLayerWeightMatrix = (float *)mkl_malloc( NUM_HIDDEN_NODES* NUM_FEATURES *sizeof( float ), 64 );
-      float * outputLayerWeightVector = (float *)mkl_malloc( NUM_OUTPUTS*NUM_HIDDEN_NODES* sizeof( float ), 64 );
-      float * targets = (float *)mkl_malloc( NUM_SAMPLES*sizeof( float ), 64 );
-      
+      float * secondLayerWeightVector = (float *)mkl_malloc( NUM_OUTPUTS*NUM_HIDDEN_NODES* sizeof( float ), 64 );
+      float * t = (float *)mkl_malloc( NUM_SAMPLES*sizeof( float ), 64 );
+      float * y = (float *)mkl_malloc( NUM_SAMPLES*sizeof( float ), 64 );
+
+      initializeMatrix( x, NUM_FEATURES , 1);
+      initializeMatrix( t, NUM_SAMPLES , 1);
+      initializeMatrix( y, NUM_SAMPLES , 1);
+
       //hard-code some values
-      features[0] = 0.74346118;
-      features[1] =  0.46465633;
-      targets[0] = 0;
+      x[0] = 0.74346118;
+      x[1] =  0.46465633;
+
+      t[0] = 0;
 
       cout << "Features are " << endl;
-      printMatrix( features, 1, NUM_FEATURES );
+      printMatrix( x, 1, NUM_FEATURES );
 
-      cout << "targets are :" << endl;
-      printMatrix( targets, 1, NUM_SAMPLES);
+      cout << "t are :" << endl;
+      printMatrix( t, 1, NUM_SAMPLES);
       //--------------------------------------------------------------------
       // randomly initialize weight matrices
       srand(time(NULL)); //set seed
       initializeMatrix( firstLayerWeightMatrix,  NUM_HIDDEN_NODES, NUM_FEATURES );
-      initializeMatrix( outputLayerWeightVector, NUM_OUTPUTS, NUM_HIDDEN_NODES );
-      initializeWeightMatrix( firstLayerWeightMatrix );
-      initializeWeightVector( outputLayerWeightVector );
+      initializeMatrix( secondLayerWeightVector, NUM_OUTPUTS, NUM_HIDDEN_NODES );
+
+      setRandomWeights( firstLayerWeightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
+      setRandomWeights( secondLayerWeightVector, NUM_OUTPUTS, NUM_HIDDEN_NODES );
 
       cout << "1st layer Weight Matrix" << endl;
       printMatrix( firstLayerWeightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
       cout << "Output layer Weight Matrix" << endl;
-      printMatrix( outputLayerWeightVector, NUM_OUTPUTS, NUM_HIDDEN_NODES );
-      //--------------------------------------------------------------------
+      printMatrix( secondLayerWeightVector, NUM_OUTPUTS, NUM_HIDDEN_NODES );
 
       //--------------------------------------------------------------------
+      // test MLP functions
+      // cross entropy function
+      y[0] = 0.5;
+      cout << "Entropy of system is " << crossEntropyFunction( t , y ) << "\n";
+
+      exit( -1 );
+      //--------------------------------------------------------------------
       //1. get activations: a_j = \sum_i^D{w_ji * x_i + w_j0}
-      float *activations = getHiddenActivations( features , firstLayerWeightMatrix );
+      float *activations = getHiddenActivations( x , firstLayerWeightMatrix );
       cout << "Hidden activations are"<< endl;
       printMatrix( activations , 1 , NUM_HIDDEN_NODES );
       //--------------------------------------------------------------------
@@ -79,16 +113,14 @@ int main(int argc, char *argv[])
       //--------------------------------------------------------------------
 
       //compute final layer
-      float *finalOutputs = getOutputActivations( z , outputLayerWeightVector );
+      float *finalOutputs = getOutputActivations( z , secondLayerWeightVector );
       cout << "finalOutputs are :" << endl;
       printMatrix( finalOutputs, 1, NUM_OUTPUTS);
       //--------------------------------------------------------------------
       //test error function
-      //errorFunction( targets , finalOutputs );
+      //errorFunction( t , finalOutputs );
       // take output and run it through sigmoid func!
       logisticSigmoid( finalOutputs );
-      //test cross entropy function
-      crossEntropyFunction( targets , finalOutputs );
       //--------------------------------------------------------------------
       //get derivative of sigmoid!
       dlogisticSigmoid( finalOutputs );
@@ -116,7 +148,7 @@ void dlogisticSigmoid( float * a ){
 
       cout << "sigma is" << sigma << "\n";
 }
-float *getOutputActivations( float * z, float * outputLayerWeightVector ){
+float *getOutputActivations( float * z, float * secondLayerWeightVector ){
       cout << "Computing final output" << endl;
       float * finalOutputs = (float *)mkl_malloc( NUM_OUTPUTS*sizeof( float ), 64 );
 
@@ -125,14 +157,14 @@ float *getOutputActivations( float * z, float * outputLayerWeightVector ){
       const float alpha = 1.0;
       const float beta = 0.0;
       const int incx = 1;
-      //cblas_dgemv( CblasRowMajor, CblasTrans, NUM_OUTPUTS, NUM_HIDDEN_NODES, alpha, outputLayerWeightVector, NUM_HIDDEN_NODES, z, incx, beta, finalOutputs, incx);
+      //cblas_dgemv( CblasRowMajor, CblasTrans, NUM_OUTPUTS, NUM_HIDDEN_NODES, alpha, secondLayerWeightVector, NUM_HIDDEN_NODES, z, incx, beta, finalOutputs, incx);
       float res = 0.0;
-      res = cblas_sdot( NUM_HIDDEN_NODES, z,incx, outputLayerWeightVector, incx);
+      res = cblas_sdot( NUM_HIDDEN_NODES, z,incx, secondLayerWeightVector, incx);
 
       finalOutputs[0] = res;
       return finalOutputs;
 }
-float *getHiddenActivations( float * features, float * weightMatrix ){
+float *getHiddenActivations( float * x, float * weightMatrix ){
       cout << "Computing 1st layer" << endl;
       float * activations = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
       initializeMatrix( activations, 1 , NUM_HIDDEN_NODES );
@@ -142,36 +174,11 @@ float *getHiddenActivations( float * features, float * weightMatrix ){
       const float beta = 0.0;
       const int incx = 1;
       cblas_sgemv( CblasRowMajor, CblasNoTrans, NUM_HIDDEN_NODES, NUM_FEATURES,
-		   alpha, weightMatrix, NUM_FEATURES, features, incx, beta, activations, incx);
+		   alpha, weightMatrix, NUM_FEATURES, x, incx, beta, activations, incx);
 
       return activations;
 }
 
-void initializeMatrix( float * Matrix , int rows, int cols ){
-      for (int i = 0; i < (rows*cols); i++) {
-	    Matrix[i] = (float)(0.0);
-      }
-}
-
-void initializeWeightMatrix( float * weightMatrix ){
-      cout << "Random Initialization of Weight Matrix" << endl;
-      for (int i = 0; i < (NUM_HIDDEN_NODES * NUM_FEATURES); ++i) {
-	    float temp = fRand( -10.0, 10.0);
-	    weightMatrix[i] = temp;
-      }
-}
-void initializeWeightVector( float * weightVector ){
-      cout << "Random Initialization of Weight Matrix" << endl;
-      for (int i = 0; i < (NUM_HIDDEN_NODES); ++i) {
-	    float temp = fRand( -10.0, 10.0);
-	    weightVector[i] = temp;
-      }
-}
-
-float fRand(float fMin, float fMax){
-      float f = (float)rand() / RAND_MAX;
-      return fMin + f * (fMax - fMin);
-}
 
 void printMatrix( float *Matrix , int rows, int cols ){
       for ( int i = 0; i < rows ; i++) {
@@ -201,63 +208,3 @@ float * activationFunction( float *a ){
       }
       return z;
 }
-
-void errorFunction( float *targets, float *finalOutputs){
-
-      cout << "Error function for training" << endl;
-      float * diff = (float *)mkl_malloc( NUM_SAMPLES * sizeof( float ), 64 );
-      float res = 0.0;
-      const int incx = 1;
-      
-      for (int i = 0; i < (NUM_SAMPLES); i++) {
-	    diff[i] = (float)(0.0);
-      }
-
-      //subtract them!
-      vsSub( NUM_SAMPLES , targets , finalOutputs, diff);
-
-      //get norm
-      res = snrm2( &(NUM_SAMPLES), diff, &incx);
-
-      //get norm squared
-      res *= res;
-      //multiply by -1.0
-      res = res * -1.0;
-      cout << "Error = " << res << endl;
-}
-void crossEntropyFunction( float *t, float *y ){
-
-      cout << "Cross Entropy function for training" << endl;
-
-      float error = 0.0;
-
-      for (int i = 0; i < NUM_SAMPLES; ++i){
-	    cout << "y is " << y[i] << endl;
-	    cout << "t is " << t[i] << endl;
-	    error += -(t[i]*log(y[i]) + (1 - t[i])*log(1 - y[i]));		  
-      }
-
-      cout << "entropy of system is " << error << endl;
-}
-
-//float * features = (float *)mkl_malloc( NUM_SAMPLES* NUM_FEATURES*sizeof( float ), 64 );
-//initializeMatrix( features, NUM_SAMPLES, NUM_FEATURES );
-
-/*
-  features[2]	=  1.65755662;  features[3]  = -0.63203157;
-  features[4]	= -0.15878875;  features[5]  =  0.25584465;
-  features[6]	= -1.088752  ;  features[7]  = -0.39694315;
-  features[8]	=  1.768052  ;  features[9]  = -0.25443213;
-  features[10]	=  1.95416454;  features[11] = -0.12850579;
-  features[12]	=  0.93694537;  features[13] =  0.36597075;
-  features[14]	=  0.88446589;  features[15] = -0.47595401;
-  features[16]	=  0.80950246;  features[17] =  0.3505231 ;
-  features[18]	=  1.2278091;   features[19] = -0.64785108;
-*/
-/*
-  targets[1] = 1; targets[6] = 0;
-  targets[2] = 1; targets[7] = 1;
-  targets[3] = 0; targets[8] = 0;
-  targets[4] = 1; targets[9] = 1;
-*/
-
