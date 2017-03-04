@@ -37,3 +37,8 @@ For this toy example, there is only 1 output. This means that
 the error function will be replaced by the cross entropy error
 AND
 "weight matrix" for the second layer is a vector!
+
+==========
+Sat Mar 04 08:58:43 CST 2017
+Now that topology is set, how to iteratively train the network for the best
+parameters?
