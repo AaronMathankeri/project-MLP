@@ -23,6 +23,9 @@ float *getHiddenActivations( float * features, float * firstLayerWeightMatrix );
 float *getOutputActivations( float * features, float * outputLayerWeightVector );
 
 void logisticSigmoid( float * finalOutputs );
+void dlogisticSigmoid( float * a );
+
+
 int main(int argc, char *argv[])
 {
       cout << " Creating a Simple Neural Net" << endl;
@@ -87,6 +90,8 @@ int main(int argc, char *argv[])
       //test cross entropy function
       crossEntropyFunction( targets , finalOutputs );
       //--------------------------------------------------------------------
+      //get derivative of sigmoid!
+      dlogisticSigmoid( finalOutputs );
       return 0;
 }
 void logisticSigmoid( float * finalOutputs ){
@@ -99,6 +104,18 @@ void logisticSigmoid( float * finalOutputs ){
       cout << "value is " << finalOutputs[0] << endl;
 }
 
+void dlogisticSigmoid( float * a ){
+      //d/da sigma(a) = sigma(a) * [1 - sigma(a)]
+      cout << "calculating derivative of Logistic Sigmoid" << "\n";
+
+      double sigma = 0.0;
+
+      //sigma = logisticSigmoid( a );
+
+      sigma = sigma * (1 - sigma);
+
+      cout << "sigma is" << sigma << "\n";
+}
 float *getOutputActivations( float * z, float * outputLayerWeightVector ){
       cout << "Computing final output" << endl;
       float * finalOutputs = (float *)mkl_malloc( NUM_OUTPUTS*sizeof( float ), 64 );
