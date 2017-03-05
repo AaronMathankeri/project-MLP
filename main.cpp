@@ -57,15 +57,27 @@ void dlogisticSigmoid( float * a , float * sigmaPrime){
       }
 }
 //-----------------------------------------------------
-//-----------------------------------------------------
+// MLP network Dependent functions
+void computeActivations( float* x, float* firstLayerWeightMatrix, float* a){
+      cout << "Computing 1st Layer Activations" << "\n";
+      // perform matrix vector multiplication: a = W*x
+      const float alpha = 1.0;
+      const float beta = 0.0;
+      const int incx = 1;
+      cblas_sgemv( CblasRowMajor, CblasNoTrans, NUM_HIDDEN_NODES, NUM_FEATURES,
+		   alpha, firstLayerWeightMatrix, NUM_FEATURES, x, incx, beta, a, incx);
+}
+void computeHiddenUnits( float* a, float* z){
+      ;
+}
 float *activationFunction( float *a );
 float *getHiddenActivations( float * x, float * firstLayerWeightMatrix );
 float *getOutputActivations( float * x, float * secondLayerWeightVector );
-
+//-----------------------------------------------------
 int main(int argc, char *argv[])
 {
       cout << " Creating a Simple Neural Net" << endl;
-
+      printf("-------------------------------------\n");
       //--------------------------------------------------------------------
       float * x = (float *)mkl_malloc( NUM_FEATURES*sizeof( float ), 64 );
       float * firstLayerWeightMatrix = (float *)mkl_malloc( NUM_HIDDEN_NODES* NUM_FEATURES *sizeof( float ), 64 );
@@ -88,6 +100,7 @@ int main(int argc, char *argv[])
 
       cout << "t are :" << endl;
       printMatrix( t, 1, NUM_SAMPLES);
+      printf("-------------------------------------\n");
       //--------------------------------------------------------------------
       // randomly initialize weight matrices
       srand(time(NULL)); //set seed
@@ -101,7 +114,7 @@ int main(int argc, char *argv[])
       printMatrix( firstLayerWeightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
       cout << "Output layer Weight Matrix" << endl;
       printMatrix( secondLayerWeightVector, NUM_OUTPUTS, NUM_HIDDEN_NODES );
-
+      printf("-------------------------------------\n");
       //--------------------------------------------------------------------
       // test MLP functions
       // cross entropy function
@@ -118,9 +131,16 @@ int main(int argc, char *argv[])
       dlogisticSigmoid( t, test );
       cout <<"Input of dSigmoid " << t[0] << "\n";
       cout <<"Output of dLogistic Sigmoid is " << test[0] << "\n";
-
-      exit( -1 );
+      printf("-------------------------------------\n");
       //--------------------------------------------------------------------
+      // test MLP topology transformations
+      float * a = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
+      float * z = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
+      initializeMatrix( a, NUM_HIDDEN_NODES , 1);
+      initializeMatrix( z, NUM_HIDDEN_NODES , 1);
+      computeActivations( x, firstLayerWeightMatrix, a);
+      printMatrix( a, NUM_HIDDEN_NODES, 1);
+      exit( -1 );
       /*
       //1. get activations: a_j = \sum_i^D{w_ji * x_i + w_j0}
       float *activations = getHiddenActivations( x , firstLayerWeightMatrix );
@@ -184,23 +204,3 @@ float *getHiddenActivations( float * x, float * weightMatrix ){
 }
 
 
-
-float * activationFunction( float *a ){
-      //sigma(a) = 1/(1 + exp(-a))
-
-      float * z = (float *)mkl_malloc( NUM_HIDDEN_NODES * sizeof( float ), 64 );
-      initializeMatrix( z , 1 , NUM_HIDDEN_NODES);
-
-      //multiply by -1
-      for (int i = 0; i < (NUM_HIDDEN_NODES); i++) {
-	    a[i] = a[i] * (-1);
-      }
-
-      vsExp( (NUM_HIDDEN_NODES), a, a );
-
-      //compute activation!
-      for (int i = 0; i < (NUM_HIDDEN_NODES); i++) {
-	    z[i] = 1/( 1 + a[i]);
-      }
-      return z;
-}

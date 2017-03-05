@@ -16,7 +16,9 @@ a
 
 #------------
 # matrix vector multiplication
-myMatrix = matrix( c(2.27326 , 6.75528, -3.92609  ,  -5.75392,-6.13284   ,  5.29003) , nrow = 3, ncol =2, byrow = TRUE )
+myMatrix = matrix( c(7.99692,     4.26953,
+                     -1.99978,     9.63194,
+                     3.95212,     3.22824) , nrow = 3, ncol =2, byrow = TRUE )
 myVector <-c(0.74346   ,  0.46466)
 myMatrix %*% myVector
 

@@ -1,3 +1,24 @@
+
+float * activationFunction( float *a ){
+      //sigma(a) = 1/(1 + exp(-a))
+
+      float * z = (float *)mkl_malloc( NUM_HIDDEN_NODES * sizeof( float ), 64 );
+      initializeMatrix( z , 1 , NUM_HIDDEN_NODES);
+
+      //multiply by -1
+      for (int i = 0; i < (NUM_HIDDEN_NODES); i++) {
+	    a[i] = a[i] * (-1);
+      }
+
+      vsExp( (NUM_HIDDEN_NODES), a, a );
+
+      //compute activation!
+      for (int i = 0; i < (NUM_HIDDEN_NODES); i++) {
+	    z[i] = 1/( 1 + a[i]);
+      }
+      return z;
+}
+
 void errorFunction( float *t, float *finalOutputs){
       cout << "Error function for training" << endl;
       float * diff = (float *)mkl_malloc( NUM_SAMPLES * sizeof( float ), 64 );
