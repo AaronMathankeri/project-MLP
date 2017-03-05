@@ -51,3 +51,7 @@ a full re-write to match notation from PRML by Bishop
 ==========
 Sat Mar 04 22:28:56 CST 2017
 not taking advantage of BLAS operations. Will do that later.
+
+==========
+Sat Mar 04 22:53:12 CST 2017
+make src slightly more abstract
