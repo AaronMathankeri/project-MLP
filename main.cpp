@@ -59,8 +59,9 @@ void dlogisticSigmoid( float * a , float * sigmaPrime, int length){
 //-----------------------------------------------------
 // MLP network Dependent functions
 void computeActivations( float* x, float* firstLayerWeightMatrix, float* a){
-      cout << "Computing 1st Layer Activations" << "\n";
+      //1. get activations: a_j = \sum_i^D{w_ji * x_i + w_j0}
       // perform matrix vector multiplication: a = W*x
+      cout << "Computing 1st Layer Activations" << "\n";
       const float alpha = 1.0;
       const float beta = 0.0;
       const int incx = 1;
@@ -71,9 +72,16 @@ void computeHiddenUnits( float* a, float* z, int length){
       logisticSigmoid( a , z , length);
 }
 
-float *activationFunction( float *a );
-float *getHiddenActivations( float * x, float * firstLayerWeightMatrix );
-float *getOutputActivations( float * x, float * secondLayerWeightVector );
+void computeOutputActivations( float* z, float* secondLayerWeightVector, float* a){
+      // perform matrix vector multiplication: y = W*z
+      cout << "Computing 2nd Layer Activations" << "\n";
+      const float alpha = 1.0;
+      const float beta = 0.0;
+      const int incx = 1;
+      float res = 0.0;
+      res = cblas_sdot( NUM_HIDDEN_NODES, z,incx, secondLayerWeightVector, incx);
+      a[0] = res;
+}
 //-----------------------------------------------------
 int main(int argc, char *argv[])
 {
@@ -128,12 +136,15 @@ int main(int argc, char *argv[])
       logisticSigmoid( t, test, NUM_OUTPUTS );
       cout <<"Input of sigmoid " << t[0] << "\n";
       cout <<"Output of Logistic Sigmoid is " << test[0] << "\n";
+
       initializeMatrix( test, 1 , NUM_SAMPLES);
+
       dlogisticSigmoid( t, test, NUM_OUTPUTS );
       cout <<"Input of dSigmoid " << t[0] << "\n";
       cout <<"Output of dLogistic Sigmoid is " << test[0] << "\n";
       printf("-------------------------------------\n");
       //--------------------------------------------------------------------
+      cout << "First Layer Calculations " << endl;
       // test MLP topology transformations
       float * a = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
       float * z = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
@@ -147,68 +158,20 @@ int main(int argc, char *argv[])
       printMatrix( a, NUM_HIDDEN_NODES, 1);
       cout << "Hidden Units are:" << "\n";
       printMatrix( z, NUM_HIDDEN_NODES, 1);
+      printf("-------------------------------------\n");
+      //--------------------------------------------------------------------
+      cout << "Second Layer Calculations " << endl;
+      float * v = (float *)mkl_malloc( NUM_OUTPUTS*sizeof( float ), 64 );
+      initializeMatrix( v, NUM_OUTPUTS , 1);
 
-      exit( -1 );
-      /*
-      //1. get activations: a_j = \sum_i^D{w_ji * x_i + w_j0}
-      float *activations = getHiddenActivations( x , firstLayerWeightMatrix );
-      cout << "Hidden activations are"<< endl;
-      printMatrix( activations , 1 , NUM_HIDDEN_NODES );
-      //--------------------------------------------------------------------
+      computeOutputActivations( z, secondLayerWeightVector, v);
+      cout << "Output activation is:" << "\n";
+      printMatrix( v, NUM_OUTPUTS, 1);
 
-      //2. transform with logistic sigmoid
-      float *z = activationFunction( activations );
-      cout << "Non-linear transformation complete. Z is " << endl;
-      printMatrix( z , 1 , NUM_HIDDEN_NODES);
-      //--------------------------------------------------------------------
-
-      //compute final layer
-      float *finalOutputs = getOutputActivations( z , secondLayerWeightVector );
-      cout << "finalOutputs are :" << endl;
-      printMatrix( finalOutputs, 1, NUM_OUTPUTS);
-      //--------------------------------------------------------------------
-      //test error function
-      //errorFunction( t , finalOutputs );
-      // take output and run it through sigmoid func!
-      //logisticSigmoid( finalOutputs );
-      //--------------------------------------------------------------------
-      //get derivative of sigmoid!
-      //dlogisticSigmoid( finalOutputs );
-      */
+      cout << "Prediction is:" << "\n";
+      logisticSigmoid(v, y, NUM_OUTPUTS);
+      printMatrix( y, NUM_OUTPUTS, 1);
+      printf("-------------------------------------\n");
+      cout << "Forward Propagation Complete." << "\n";
       return 0;
 }
-
-
-
-float *getOutputActivations( float * z, float * secondLayerWeightVector ){
-      cout << "Computing final output" << endl;
-      float * finalOutputs = (float *)mkl_malloc( NUM_OUTPUTS*sizeof( float ), 64 );
-
-      initializeMatrix( finalOutputs, 1 , NUM_OUTPUTS );
-      // perform matrix vector multiplication: y = W*z
-      const float alpha = 1.0;
-      const float beta = 0.0;
-      const int incx = 1;
-      //cblas_dgemv( CblasRowMajor, CblasTrans, NUM_OUTPUTS, NUM_HIDDEN_NODES, alpha, secondLayerWeightVector, NUM_HIDDEN_NODES, z, incx, beta, finalOutputs, incx);
-      float res = 0.0;
-      res = cblas_sdot( NUM_HIDDEN_NODES, z,incx, secondLayerWeightVector, incx);
-
-      finalOutputs[0] = res;
-      return finalOutputs;
-}
-float *getHiddenActivations( float * x, float * weightMatrix ){
-      cout << "Computing 1st layer" << endl;
-      float * activations = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
-      initializeMatrix( activations, 1 , NUM_HIDDEN_NODES );
-
-      // perform matrix vector multiplication: a = W*x
-      const float alpha = 1.0;
-      const float beta = 0.0;
-      const int incx = 1;
-      cblas_sgemv( CblasRowMajor, CblasNoTrans, NUM_HIDDEN_NODES, NUM_FEATURES,
-		   alpha, weightMatrix, NUM_FEATURES, x, incx, beta, activations, incx);
-
-      return activations;
-}
-
-
