@@ -72,7 +72,7 @@ void computeHiddenUnits( float* a, float* z, int length){
       logisticSigmoid( a , z , length);
 }
 
-void computeOutputActivations( float* z, float* secondLayerWeightVector, float* a){
+void computeOutputActivations( float* z, float* secondLayerWeightVector, float* v){
       // perform matrix vector multiplication: y = W*z
       cout << "Computing 2nd Layer Activations" << "\n";
       const float alpha = 1.0;
@@ -80,8 +80,39 @@ void computeOutputActivations( float* z, float* secondLayerWeightVector, float* 
       const int incx = 1;
       float res = 0.0;
       res = cblas_sdot( NUM_HIDDEN_NODES, z,incx, secondLayerWeightVector, incx);
-      a[0] = res;
+      v[0] = res;
 }
+//-----------------------------------------------------
+// BackProp algorithms
+float computeOutputErrors( float* y, float* t){
+      float delta = 0.0;
+      delta = y[0] - t[0];
+      return delta;
+}
+void computeHiddenErrors( float* a, float* secondLayerWeightVector, float delta, float* hiddenDeltas){
+      cout << "Computing Hidden Errors" << endl;
+      float * dA = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
+      initializeMatrix( dA, NUM_HIDDEN_NODES, 1);
+
+      dlogisticSigmoid( a, dA, NUM_HIDDEN_NODES );
+      for (int i = 0; i < NUM_HIDDEN_NODES; ++i) {
+	    secondLayerWeightVector[i] = secondLayerWeightVector[i]*delta;
+	    hiddenDeltas[i] = dA[i]*secondLayerWeightVector[i];
+      }
+}
+void computeSecondLayerDerivatives( float* z, float delta, float* secondLayerDerivatives){
+      for (int i = 0; i < NUM_HIDDEN_NODES; ++i) {
+	    secondLayerDerivatives[i] = z[i]*delta;
+      }
+}
+void computeFirstLayerDerivatives( float* x, float* hiddenDeltas, float* firstLayerDerivatives){
+      for (int i = 0; i < NUM_HIDDEN_NODES; ++i) {
+	    for (int j = 0; j < NUM_FEATURES; ++j) {
+		  firstLayerDerivatives[i*NUM_FEATURES + j] = hiddenDeltas[i]*x[j];
+	    }
+      }
+}
+
 //-----------------------------------------------------
 int main(int argc, char *argv[])
 {
@@ -125,27 +156,6 @@ int main(int argc, char *argv[])
       printMatrix( secondLayerWeightVector, NUM_OUTPUTS, NUM_HIDDEN_NODES );
       printf("-------------------------------------\n");
       //--------------------------------------------------------------------
-      /*
-      // test MLP functions
-      // cross entropy function
-      y[0] = 0.5;
-      cout << "Entropy of system is " << crossEntropyFunction( t , y ) << "\n";
-
-      float * test = (float *)mkl_malloc( NUM_SAMPLES*sizeof( float ), 64 );
-      initializeMatrix( test, 1 , NUM_SAMPLES);
-	    
-      logisticSigmoid( t, test, NUM_OUTPUTS );
-      cout <<"Input of sigmoid " << t[0] << "\n";
-      cout <<"Output of Logistic Sigmoid is " << test[0] << "\n";
-
-      initializeMatrix( test, 1 , NUM_SAMPLES);
-
-      dlogisticSigmoid( t, test, NUM_OUTPUTS );
-      cout <<"Input of dSigmoid " << t[0] << "\n";
-      cout <<"Output of dLogistic Sigmoid is " << test[0] << "\n";
-      printf("-------------------------------------\n");
-      */
-      //--------------------------------------------------------------------
       cout << "First Layer Calculations " << endl;
       // test MLP topology transformations
       float * a = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
@@ -175,9 +185,31 @@ int main(int argc, char *argv[])
       printMatrix( y, NUM_OUTPUTS, 1);
       cout << "Forward Propagation Complete." << "\n";
       printf("-------------------------------------\n");
+      cout << "Cross Entropy error is " << crossEntropyFunction( t , y ) << "\n";
+      printf("-------------------------------------\n");
       //--------------------------------------------------------------------
       cout << "Begin  BackPropagation... " << "\n";
+      float delta = 0.0;
+      delta = computeOutputErrors( y, t);
+      cout << "Output Errors " << delta  << "\n";
 
+      float * hiddenDeltas = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
+      initializeMatrix( hiddenDeltas, NUM_HIDDEN_NODES, 1);
+      computeHiddenErrors( a, secondLayerWeightVector, delta, hiddenDeltas);
+      printMatrix( hiddenDeltas, NUM_HIDDEN_NODES, 1);
+
+
+      float * secondLayerDerivatives = (float *)mkl_malloc( NUM_OUTPUTS*NUM_HIDDEN_NODES* sizeof( float ), 64 );
+      initializeMatrix( secondLayerDerivatives, NUM_OUTPUTS, NUM_HIDDEN_NODES );
+      computeSecondLayerDerivatives( z, delta, secondLayerDerivatives);
+      cout << "Second Layer derivatives " << endl;
+      printMatrix( secondLayerDerivatives, NUM_HIDDEN_NODES, NUM_OUTPUTS);
+
+      float * firstLayerDerivatives = (float *)mkl_malloc( NUM_HIDDEN_NODES* NUM_FEATURES *sizeof( float ), 64 );
+      initializeMatrix( firstLayerDerivatives, NUM_HIDDEN_NODES, NUM_FEATURES );
+      computeFirstLayerDerivatives( x, hiddenDeltas, firstLayerDerivatives);
+      cout << "First Layer derivatives " << endl;
+      printMatrix( firstLayerDerivatives, NUM_HIDDEN_NODES, NUM_FEATURES );
 
       printf("-------------------------------------\n");
       //--------------------------------------------------------------------

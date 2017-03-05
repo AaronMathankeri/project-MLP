@@ -1,3 +1,24 @@
+      /*
+      // test MLP functions
+      // cross entropy function
+      y[0] = 0.5;
+      cout << "Entropy of system is " << crossEntropyFunction( t , y ) << "\n";
+
+      float * test = (float *)mkl_malloc( NUM_SAMPLES*sizeof( float ), 64 );
+      initializeMatrix( test, 1 , NUM_SAMPLES);
+	    
+      logisticSigmoid( t, test, NUM_OUTPUTS );
+      cout <<"Input of sigmoid " << t[0] << "\n";
+      cout <<"Output of Logistic Sigmoid is " << test[0] << "\n";
+
+      initializeMatrix( test, 1 , NUM_SAMPLES);
+
+      dlogisticSigmoid( t, test, NUM_OUTPUTS );
+      cout <<"Input of dSigmoid " << t[0] << "\n";
+      cout <<"Output of dLogistic Sigmoid is " << test[0] << "\n";
+      printf("-------------------------------------\n");
+      */
+      //--------------------------------------------------------------------
 
 float * activationFunction( float *a ){
       //sigma(a) = 1/(1 + exp(-a))
