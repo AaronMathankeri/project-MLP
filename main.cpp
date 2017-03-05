@@ -43,16 +43,16 @@ float crossEntropyFunction( float *t, float *y ){
       }
       return entropy;
 }
-void logisticSigmoid( float * a , float *sigma){
+void logisticSigmoid( float * a , float *sigma, int length){
       //sigma(a) = 1/(1 + exp(-a))
-      for (int i = 0; i < (NUM_OUTPUTS); i++) {
+      for (int i = 0; i < (length); i++) {
 	    sigma[i] = 1/( 1 + exp(-a[i]));
       }
 }
-void dlogisticSigmoid( float * a , float * sigmaPrime){
+void dlogisticSigmoid( float * a , float * sigmaPrime, int length){
       //d/da sigma(a) = sigma(a) * [1 - sigma(a)]
-      logisticSigmoid(a, sigmaPrime);
-      for (int i = 0; i < (NUM_OUTPUTS); ++i) {
+      logisticSigmoid(a, sigmaPrime, length);
+      for (int i = 0; i < (length); ++i) {
 	    sigmaPrime[i] = sigmaPrime[i]*(1 - sigmaPrime[i] );
       }
 }
@@ -67,9 +67,10 @@ void computeActivations( float* x, float* firstLayerWeightMatrix, float* a){
       cblas_sgemv( CblasRowMajor, CblasNoTrans, NUM_HIDDEN_NODES, NUM_FEATURES,
 		   alpha, firstLayerWeightMatrix, NUM_FEATURES, x, incx, beta, a, incx);
 }
-void computeHiddenUnits( float* a, float* z){
-      ;
+void computeHiddenUnits( float* a, float* z, int length){
+      logisticSigmoid( a , z , length);
 }
+
 float *activationFunction( float *a );
 float *getHiddenActivations( float * x, float * firstLayerWeightMatrix );
 float *getOutputActivations( float * x, float * secondLayerWeightVector );
@@ -124,11 +125,11 @@ int main(int argc, char *argv[])
       float * test = (float *)mkl_malloc( NUM_SAMPLES*sizeof( float ), 64 );
       initializeMatrix( test, 1 , NUM_SAMPLES);
 	    
-      logisticSigmoid( t, test );
+      logisticSigmoid( t, test, NUM_OUTPUTS );
       cout <<"Input of sigmoid " << t[0] << "\n";
       cout <<"Output of Logistic Sigmoid is " << test[0] << "\n";
       initializeMatrix( test, 1 , NUM_SAMPLES);
-      dlogisticSigmoid( t, test );
+      dlogisticSigmoid( t, test, NUM_OUTPUTS );
       cout <<"Input of dSigmoid " << t[0] << "\n";
       cout <<"Output of dLogistic Sigmoid is " << test[0] << "\n";
       printf("-------------------------------------\n");
@@ -138,8 +139,15 @@ int main(int argc, char *argv[])
       float * z = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
       initializeMatrix( a, NUM_HIDDEN_NODES , 1);
       initializeMatrix( z, NUM_HIDDEN_NODES , 1);
+
       computeActivations( x, firstLayerWeightMatrix, a);
+      computeHiddenUnits( a , z, NUM_HIDDEN_NODES );
+      
+      cout << "Activations are:" << "\n";
       printMatrix( a, NUM_HIDDEN_NODES, 1);
+      cout << "Hidden Units are:" << "\n";
+      printMatrix( z, NUM_HIDDEN_NODES, 1);
+
       exit( -1 );
       /*
       //1. get activations: a_j = \sum_i^D{w_ji * x_i + w_j0}
