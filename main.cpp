@@ -85,7 +85,7 @@ void computeOutputActivations( float* z, float* secondLayerWeightVector, float* 
 //-----------------------------------------------------
 int main(int argc, char *argv[])
 {
-      cout << " Creating a Simple Neural Net" << endl;
+      cout << " CREATING A SIMPLE NEURAL NET" << endl;
       printf("-------------------------------------\n");
       //--------------------------------------------------------------------
       float * x = (float *)mkl_malloc( NUM_FEATURES*sizeof( float ), 64 );
@@ -125,6 +125,7 @@ int main(int argc, char *argv[])
       printMatrix( secondLayerWeightVector, NUM_OUTPUTS, NUM_HIDDEN_NODES );
       printf("-------------------------------------\n");
       //--------------------------------------------------------------------
+      /*
       // test MLP functions
       // cross entropy function
       y[0] = 0.5;
@@ -143,6 +144,7 @@ int main(int argc, char *argv[])
       cout <<"Input of dSigmoid " << t[0] << "\n";
       cout <<"Output of dLogistic Sigmoid is " << test[0] << "\n";
       printf("-------------------------------------\n");
+      */
       //--------------------------------------------------------------------
       cout << "First Layer Calculations " << endl;
       // test MLP topology transformations
@@ -171,7 +173,13 @@ int main(int argc, char *argv[])
       cout << "Prediction is:" << "\n";
       logisticSigmoid(v, y, NUM_OUTPUTS);
       printMatrix( y, NUM_OUTPUTS, 1);
-      printf("-------------------------------------\n");
       cout << "Forward Propagation Complete." << "\n";
+      printf("-------------------------------------\n");
+      //--------------------------------------------------------------------
+      cout << "Begin  BackPropagation... " << "\n";
+
+
+      printf("-------------------------------------\n");
+      //--------------------------------------------------------------------
       return 0;
 }
