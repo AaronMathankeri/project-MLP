@@ -47,3 +47,7 @@ parameters?
 Sat Mar 04 16:41:21 CST 2017
 getting hard creating algorithms to match literature. I'm going to do
 a full re-write to match notation from PRML by Bishop
+
+==========
+Sat Mar 04 22:28:56 CST 2017
+not taking advantage of BLAS operations. Will do that later.
