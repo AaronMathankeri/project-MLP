@@ -112,7 +112,22 @@ void computeFirstLayerDerivatives( float* x, float* hiddenDeltas, float* firstLa
 	    }
       }
 }
-
+//-----------------------------------------------------
+// Gradient descent updates
+void updateFirstLayerWeights( float* firstLayerWeightMatrix, const float* firstLayerDerivatives, const float learningRate){
+      for (int i = 0; i < (NUM_HIDDEN_NODES*NUM_FEATURES); ++i) {
+	    firstLayerWeightMatrix[i] = firstLayerWeightMatrix[i] - (learningRate*firstLayerDerivatives[i]);
+      }
+      cout << "New values for 1st layer Weight Matrix" << endl;
+      printMatrix( firstLayerWeightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
+}
+void updateSecondLayerWeights( float* secondLayerWeightVector, const float* secondLayerDerivatives, const float learningRate){
+      for (int i = 0; i < (NUM_HIDDEN_NODES*NUM_OUTPUTS); ++i) {
+	    secondLayerWeightVector[i] = secondLayerWeightVector[i] - (learningRate*secondLayerWeightVector[i]);
+      }
+      cout << "New values for output layer Weight Matrix" << endl;
+      printMatrix( secondLayerWeightVector,  NUM_HIDDEN_NODES, NUM_OUTPUTS );
+}
 //-----------------------------------------------------
 int main(int argc, char *argv[])
 {
@@ -220,21 +235,12 @@ int main(int argc, char *argv[])
 
       printf("-------------------------------------\n");
       cout << "Update Parameters... " << "\n";
-      
+
       //update 1st layer:
-      for (int i = 0; i < (NUM_HIDDEN_NODES*NUM_FEATURES); ++i) {
-	    firstLayerWeightMatrix[i] = firstLayerWeightMatrix[i] - (learningRate*firstLayerDerivatives[i]);
-      }
-      cout << "New values for 1st layer Weight Matrix" << endl;
-      printMatrix( firstLayerWeightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
+      updateFirstLayerWeights(firstLayerWeightMatrix, firstLayerDerivatives, learningRate);
 
-      for (int i = 0; i < (NUM_HIDDEN_NODES*NUM_OUTPUTS); ++i) {
-	    secondLayerWeightVector[i] = secondLayerWeightVector[i] - (learningRate*secondLayerWeightVector[i]);
-      }
-
-      cout << "New values for output layer Weight Matrix" << endl;
-      printMatrix( secondLayerWeightVector,  NUM_HIDDEN_NODES, NUM_OUTPUTS );
-
+      //update 2nd layer:
+      updateSecondLayerWeights(secondLayerWeightVector, secondLayerDerivatives, learningRate);
 
       printf("-------------------------------------\n");
       //--------------------------------------------------------------------
