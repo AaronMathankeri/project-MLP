@@ -55,3 +55,8 @@ not taking advantage of BLAS operations. Will do that later.
 ==========
 Sat Mar 04 22:53:12 CST 2017
 make src slightly more abstract
+
+==========
+Thu Mar 09 20:57:31 CST 2017
+It's almost complete. Now everything needs to go in a loop with accuracy predefined.
+It's actually relatively trivial.
