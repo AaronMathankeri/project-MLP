@@ -8,7 +8,7 @@ const int NUM_SAMPLES = 1;
 const int NUM_FEATURES = 2;
 const int NUM_HIDDEN_NODES = 3;
 const int NUM_OUTPUTS = 1;
-
+const float learningRate = 0.01;
 //-----------------------------------------------------
 //I-O functions
 void printMatrix( float *Matrix , int nRows, int nCols ){
@@ -217,6 +217,24 @@ int main(int argc, char *argv[])
       computeFirstLayerDerivatives( x, hiddenDeltas, firstLayerDerivatives);
       cout << "First Layer derivatives " << endl;
       printMatrix( firstLayerDerivatives, NUM_HIDDEN_NODES, NUM_FEATURES );
+
+      printf("-------------------------------------\n");
+      cout << "Update Parameters... " << "\n";
+      
+      //update 1st layer:
+      for (int i = 0; i < (NUM_HIDDEN_NODES*NUM_FEATURES); ++i) {
+	    firstLayerWeightMatrix[i] = firstLayerWeightMatrix[i] - (learningRate*firstLayerDerivatives[i]);
+      }
+      cout << "New values for 1st layer Weight Matrix" << endl;
+      printMatrix( firstLayerWeightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
+
+      for (int i = 0; i < (NUM_HIDDEN_NODES*NUM_OUTPUTS); ++i) {
+	    secondLayerWeightVector[i] = secondLayerWeightVector[i] - (learningRate*secondLayerWeightVector[i]);
+      }
+
+      cout << "New values for output layer Weight Matrix" << endl;
+      printMatrix( secondLayerWeightVector,  NUM_HIDDEN_NODES, NUM_OUTPUTS );
+
 
       printf("-------------------------------------\n");
       //--------------------------------------------------------------------
