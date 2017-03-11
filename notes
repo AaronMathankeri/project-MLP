@@ -60,3 +60,9 @@ make src slightly more abstract
 Thu Mar 09 20:57:31 CST 2017
 It's almost complete. Now everything needs to go in a loop with accuracy predefined.
 It's actually relatively trivial.
+
+==========
+Sat Mar 11 10:02:11 CST 2017
+have to do a couple of things.
+1) multiple samples
+2) gradient descent on multiple samples
