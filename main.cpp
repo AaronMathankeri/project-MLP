@@ -135,11 +135,18 @@ int main(int argc, char *argv[])
       cout << " CREATING A SIMPLE NEURAL NET" << endl;
       printf("-------------------------------------\n");
       //--------------------------------------------------------------------
-      float * x = (float *)mkl_malloc( NUM_FEATURES*sizeof( float ), 64 );
+      float * x = (float *)mkl_malloc( NUM_FEATURES*sizeof( float ), 64 ); //features
       float * firstLayerWeightMatrix = (float *)mkl_malloc( NUM_HIDDEN_NODES* NUM_FEATURES *sizeof( float ), 64 );
       float * secondLayerWeightVector = (float *)mkl_malloc( NUM_OUTPUTS*NUM_HIDDEN_NODES* sizeof( float ), 64 );
-      float * t = (float *)mkl_malloc( NUM_SAMPLES*sizeof( float ), 64 );
-      float * y = (float *)mkl_malloc( NUM_SAMPLES*sizeof( float ), 64 );
+      float * t = (float *)mkl_malloc( NUM_SAMPLES*sizeof( float ), 64 ); //targets
+      float * y = (float *)mkl_malloc( NUM_SAMPLES*sizeof( float ), 64 ); //predictions
+      float * a = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );//activations
+      float * z = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );//hidden units
+      float * v = (float *)mkl_malloc( NUM_OUTPUTS*sizeof( float ), 64 );//output activations
+      float * hiddenDeltas = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 ); //errors from backprop
+      float * firstLayerDerivatives = (float *)mkl_malloc( NUM_HIDDEN_NODES* NUM_FEATURES *sizeof( float ), 64 );
+      float * secondLayerDerivatives = (float *)mkl_malloc( NUM_OUTPUTS*NUM_HIDDEN_NODES* sizeof( float ), 64 );
+      float delta = 0.0; //error from initialbackprop
 
       initializeMatrix( x, NUM_FEATURES , 1);
       initializeMatrix( t, NUM_SAMPLES , 1);
@@ -158,6 +165,8 @@ int main(int argc, char *argv[])
       printMatrix( t, NUM_SAMPLES, 1 );
       printf("-------------------------------------\n");
       //--------------------------------------------------------------------
+
+
       // randomly initialize weight matrices
       srand(time(NULL)); //set seed
       initializeMatrix( firstLayerWeightMatrix,  NUM_HIDDEN_NODES, NUM_FEATURES );
@@ -176,8 +185,6 @@ int main(int argc, char *argv[])
       //--------------------------------------------------------------------
       cout << "First Layer Calculations " << endl;
       // test MLP topology transformations
-      float * a = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
-      float * z = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
 
       initializeMatrix( a, NUM_HIDDEN_NODES , 1);
       initializeMatrix( z, NUM_HIDDEN_NODES , 1);
@@ -194,7 +201,7 @@ int main(int argc, char *argv[])
       printf("-------------------------------------\n");
       //--------------------------------------------------------------------
       cout << "Second Layer Calculations " << endl;
-      float * v = (float *)mkl_malloc( NUM_OUTPUTS*sizeof( float ), 64 );
+
       initializeMatrix( v, NUM_OUTPUTS , 1);
 
       computeOutputActivations( z, secondLayerWeightVector, v);
@@ -213,22 +220,22 @@ int main(int argc, char *argv[])
       //--------------------------------------------------------------------
       cout << "Begin  BackPropagation... " << "\n";
 
-      float delta = 0.0;
+
       delta = computeOutputErrors( y, t);
       cout << "Output Errors " << delta  << "\n";
 
-      float * hiddenDeltas = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
+
       initializeMatrix( hiddenDeltas, NUM_HIDDEN_NODES, 1);
       computeHiddenErrors( a, secondLayerWeightVector, delta, hiddenDeltas);
       printMatrix( hiddenDeltas, NUM_HIDDEN_NODES, 1);
 
-      float * secondLayerDerivatives = (float *)mkl_malloc( NUM_OUTPUTS*NUM_HIDDEN_NODES* sizeof( float ), 64 );
+
       initializeMatrix( secondLayerDerivatives, NUM_OUTPUTS, NUM_HIDDEN_NODES );
       computeSecondLayerDerivatives( z, delta, secondLayerDerivatives);
       cout << "Second Layer derivatives " << endl;
       printMatrix( secondLayerDerivatives, NUM_HIDDEN_NODES, NUM_OUTPUTS);
 
-      float * firstLayerDerivatives = (float *)mkl_malloc( NUM_HIDDEN_NODES* NUM_FEATURES *sizeof( float ), 64 );
+
       initializeMatrix( firstLayerDerivatives, NUM_HIDDEN_NODES, NUM_FEATURES );
       computeFirstLayerDerivatives( x, hiddenDeltas, firstLayerDerivatives);
       cout << "First Layer derivatives " << endl;
