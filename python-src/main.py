@@ -5,7 +5,7 @@ from sklearn import datasets
 #----------------------------------------------------------------------
 # Generate a dataset
 np.random.seed( 0 )
-X, y = datasets.make_moons( 200, noise = 0.20 )
+X, y = datasets.make_moons( 2, noise = 0.20 )
 #----------------------------------------------------------------------
 print ( X[0:10] )
 print ( y[0:10] )
@@ -56,15 +56,19 @@ def build_model(nn_hdim, num_passes=20000, print_loss=False):
     b1 = np.zeros((1, nn_hdim))
     W2 = np.random.randn(nn_hdim, nn_output_dim) / np.sqrt(nn_hdim)
     b2 = np.zeros((1, nn_output_dim))
+    print("2nd layer weights are...")
+    print(W2)
  
     # This is what we return at the end
     model = {}
      
     # Gradient descent. For each batch...
-    for i in xrange(0, num_passes):
+    for i in xrange(0, 1):
  
         # Forward propagation
         z1 = X.dot(W1) + b1
+        print("1st layer activations are...")
+        print(z1)
         a1 = np.tanh(z1)
         z2 = a1.dot(W2) + b2
         exp_scores = np.exp(z2)
@@ -111,15 +115,15 @@ x = np.array( [0.73464181  , 0.64646533] )
 
 #----------------------------------------------------------------------
 #----------------------------------------------------------------------
-start = timeit.default_timer( )
-myClassifier = MLPClassifier(solver='lbfgs', alpha=1e-2,
-                             hidden_layer_sizes=(5, 2),
-                             random_state=0, verbose=True).fit(X, y)
-#print myClassifier
-x = x.reshape(1, -1)
-print( myClassifier.predict( x ) )
-stop = timeit.default_timer( )
-
-print ( "Time to completion :" , (stop - start) )
+#start = timeit.default_timer( )
+#myClassifier = MLPClassifier(solver='lbfgs', alpha=1e-2,
+#                             hidden_layer_sizes=(5, 2),
+#                             random_state=0, verbose=True).fit(X, y)
+##print myClassifier
+#x = x.reshape(1, -1)
+#print( myClassifier.predict( x ) )
+#stop = timeit.default_timer( )
+#
+#print ( "Time to completion :" , (stop - start) )
 
 #----------------------------------------------------------------------

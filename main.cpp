@@ -153,10 +153,12 @@ int main(int argc, char *argv[])
       initializeMatrix( y, NUM_SAMPLES , 1);
 
       //hard-code some values
-      x[0] = 0.74346118;
-      x[1] = 0.46465633;
-
-      t[0] = 0.0;
+      x[0] = 0.22455898;
+      x[1] = 0.56056104;
+      //x[0] = 1.01417185;
+      //x[1] = 0.01460828;
+      t[0] = 1.0;
+      //t[0] = 0.0;
 
       cout << "Features are :" << endl;
       printMatrix( x, NUM_FEATURES, 1 );
@@ -172,8 +174,16 @@ int main(int argc, char *argv[])
       initializeMatrix( firstLayerWeightMatrix,  NUM_HIDDEN_NODES, NUM_FEATURES );
       initializeMatrix( secondLayerWeightVector, NUM_OUTPUTS, NUM_HIDDEN_NODES );
 
-      setRandomWeights( firstLayerWeightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
-      setRandomWeights( secondLayerWeightVector, NUM_OUTPUTS, NUM_HIDDEN_NODES );
+      // setRandomWeights( firstLayerWeightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
+      firstLayerWeightMatrix[0] = 1.24737338; firstLayerWeightMatrix[1] = 1.58455078;
+      firstLayerWeightMatrix[2] = 0.28295388; firstLayerWeightMatrix[3] = 1.32056292;
+      firstLayerWeightMatrix[4] = 0.69207227; firstLayerWeightMatrix[5] = -0.69103982;
+
+      // setRandomWeights( secondLayerWeightVector, NUM_OUTPUTS, NUM_HIDDEN_NODES );
+      secondLayerWeightVector[0] = -0.08738612;
+      secondLayerWeightVector[1] = 0.23705916;
+      secondLayerWeightVector[2] = 0.8396252;
+
 
       cout << "1st layer Weight Matrix" << endl;
       printMatrix( firstLayerWeightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
@@ -190,6 +200,7 @@ int main(int argc, char *argv[])
       initializeMatrix( z, NUM_HIDDEN_NODES , 1);
 
       computeActivations( x, firstLayerWeightMatrix, a);
+
       computeHiddenUnits( a , z, NUM_HIDDEN_NODES );
       
       cout << "Activations are:" << "\n";
@@ -199,6 +210,7 @@ int main(int argc, char *argv[])
       printMatrix( z, NUM_HIDDEN_NODES, 1);
 
       printf("-------------------------------------\n");
+
       //--------------------------------------------------------------------
       cout << "Second Layer Calculations " << endl;
 
