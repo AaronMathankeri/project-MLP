@@ -1,0 +1,61 @@
+ CREATING A SIMPLE NEURAL NET
+-------------------------------------
+Features are :
+     1.01417
+     0.01461
+Targets are :
+     0.00000
+-------------------------------------
+1st layer Weight Matrix
+     1.24737     1.58455
+     0.28295     1.32056
+     0.69207    -0.69104
+Output layer Weight Matrix
+    -0.08739     0.23706     0.83963
+-------------------------------------
+First Layer Calculations 
+Computing 1st Layer Activations
+Activations are:
+     1.28820
+     0.30626
+     0.69179
+Hidden Units are:
+     0.78384
+     0.57597
+     0.66636
+-------------------------------------
+Second Layer Calculations 
+Computing 2nd Layer Activations
+Output activation is:
+     0.62754
+Prediction is:
+     0.65193
+Forward Propagation Complete.
+-------------------------------------
+Cross Entropy error is 1.05535
+-------------------------------------
+Begin  BackPropagation... 
+Output Errors 0.651931
+Computing Hidden Errors
+    -0.00965
+     0.03774
+     0.12169
+Second Layer derivatives 
+     0.51101
+     0.37549
+     0.43442
+First Layer derivatives 
+    -0.00979    -0.00014
+     0.03828     0.00055
+     0.12342     0.00178
+-------------------------------------
+Update Parameters... 
+New values for 1st layer Weight Matrix
+     1.24747     1.58455
+     0.28257     1.32056
+     0.69084    -0.69106
+New values for output layer Weight Matrix
+    -0.05640
+     0.15300
+     0.54190
+-------------------------------------

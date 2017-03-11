@@ -153,12 +153,12 @@ int main(int argc, char *argv[])
       initializeMatrix( y, NUM_SAMPLES , 1);
 
       //hard-code some values
-      x[0] = 0.22455898;
-      x[1] = 0.56056104;
-      //x[0] = 1.01417185;
-      //x[1] = 0.01460828;
-      t[0] = 1.0;
-      //t[0] = 0.0;
+      //x[0] = 0.22455898;
+      //x[1] = 0.56056104;
+      x[0] = 1.01417185;
+      x[1] = 0.01460828;
+      //t[0] = 1.0;
+      t[0] = 0.0;
 
       cout << "Features are :" << endl;
       printMatrix( x, NUM_FEATURES, 1 );
