@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
       printMatrix( secondLayerWeightVector, NUM_OUTPUTS, NUM_HIDDEN_NODES );
 
       printf("-------------------------------------\n");
-
+      double error = 0.0;
       for (int i = 0; i < 2; ++i) {
 
 	    float* currentInput = inputData[i];
@@ -250,8 +250,9 @@ int main(int argc, char *argv[])
 
 	    cout << "Forward Propagation Complete." << "\n";
 	    //printf("-------------------------------------\n");
-
-	    cout << "Cross Entropy error is " << crossEntropyFunction( currentOutput , y ) << "\n";
+	    error += crossEntropyFunction( currentOutput, y );
+	    cout << "Cross Entropy error is " << error << "\n";
+	    //cout << "Cross Entropy error is " << crossEntropyFunction( currentOutput , y ) << "\n";
 	    //printf("-------------------------------------\n");
 	    //--------------------------------------------------------------------
 	    cout << "Begin  BackPropagation... " << "\n";
@@ -282,6 +283,7 @@ int main(int argc, char *argv[])
       printf("-------------------------------------\n");
 
       //*/
+
       //--------------------------------------------------------------------
       return 0;
 }
