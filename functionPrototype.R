@@ -39,3 +39,15 @@ y =
 ce <- crossEntropy( t , y)
 
 ce
+
+#--------------
+# two sampels with different derivatives, add values so I can reproduce these
+# values in c++
+A = matrix( c(0.00137,     0.00341,
+            -0.00438,    -0.01093,
+            -0.01790 ,   -0.04470) , nrow = 3, ncol =2, byrow = TRUE )
+B =  matrix( c(-0.00979,    -0.00014,
+               0.03828,     0.00055,
+               0.12342 ,    0.00178) , nrow = 3, ncol =2, byrow = TRUE )
+
+A+B
