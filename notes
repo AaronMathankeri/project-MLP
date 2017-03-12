@@ -66,3 +66,11 @@ Sat Mar 11 10:02:11 CST 2017
 have to do a couple of things.
 1) multiple samples
 2) gradient descent on multiple samples
+
+==========
+Sun Mar 12 08:54:15 CDT 2017
+Ok, i have the "multiple samples" task complete. Now, its time for some
+code clean up.
+- separate files
+- classes
+- functions
