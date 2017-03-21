@@ -5,7 +5,7 @@
  *  Detailed description
  *
  */
-#include "../include/gradientDescent.hpp"
+#include "gradientDescent.hpp"
 
 //-----------------------------------------------------
 // Gradient descent updates

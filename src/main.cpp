@@ -3,12 +3,12 @@
 #include "mathimf.h"
 #include <vector>
 
-#include "../include/feedForwardFunctions.hpp"
-#include "../include/ioFunctions.hpp"
-#include "../include/initializations.hpp"
-#include "../include/networkAgnosticFunctions.hpp"
-#include "../include/backpropFunctions.hpp"
-#include "../include/gradientDescent.hpp"
+#include "feedForwardFunctions.hpp"
+#include "ioFunctions.hpp"
+#include "initializations.hpp"
+#include "networkAgnosticFunctions.hpp"
+#include "backpropFunctions.hpp"
+#include "gradientDescent.hpp"
 
 using namespace std;
 

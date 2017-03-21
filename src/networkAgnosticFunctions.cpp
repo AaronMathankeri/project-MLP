@@ -6,7 +6,7 @@
  *
  */
 
-#include "../include/networkAgnosticFunctions.hpp"
+#include "networkAgnosticFunctions.hpp"
 
 //-----------------------------------------------------
 // MLP network Independent functions

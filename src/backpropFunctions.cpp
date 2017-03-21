@@ -5,7 +5,7 @@
  *  Detailed description
  *
  */
-#include "../include/backpropFunctions.hpp"
+#include "backpropFunctions.hpp"
 //-----------------------------------------------------
 // BackProp algorithms
 float computeOutputErrors( float* y, float* t){

@@ -5,8 +5,7 @@
  *  Detailed description
  *
  */
-#include "../include/ioFunctions.hpp"
-
+#include "ioFunctions.hpp"
 //-----------------------------------------------------
 //I-O functions
 void printMatrix( float *Matrix , int nRows, int nCols ){

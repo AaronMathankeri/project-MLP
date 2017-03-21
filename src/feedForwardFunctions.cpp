@@ -5,7 +5,7 @@
  *  Detailed description
  *
  */
-#include "../include/feedForwardFunctions.hpp"
+#include "feedForwardFunctions.hpp"
 #include "mathimf.h"
 
 //-----------------------------------------------------

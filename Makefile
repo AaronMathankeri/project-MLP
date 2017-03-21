@@ -1,5 +1,5 @@
 CC=icpc
-FLAGS=-std=c++11 -mkl
+FLAGS=-std=c++11 -mkl -I ./include/
 
 all: compile clean
 
