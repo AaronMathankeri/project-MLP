@@ -12,7 +12,7 @@
 #include <iostream>
 #include "mkl.h"
 #include "mlpParameters.hpp"
-
+#include "networkAgnosticFunctions.hpp"
 using namespace std;
 
 //-----------------------------------------------------
@@ -21,6 +21,6 @@ void computeActivations( float* x, float* firstLayerWeightMatrix, float* a);
 void computeHiddenUnits( float* a, float* z, int length);
 void computeOutputActivations( float* z, float* secondLayerWeightVector, float* v);
 //-----------------------------------------------------
-void logisticSigmoid( float * a , float *sigma, int length);
+//void logisticSigmoid( float * a , float *sigma, int length);
 
 #endif /* FEEDFORWARDFUNCTIONS_H */

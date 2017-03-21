@@ -6,7 +6,7 @@
  *
  */
 
-#include "initializations.hpp"
+#include "../include/initializations.hpp"
 
 //-----------------------------------------------------
 //initialize to avoid memory errors

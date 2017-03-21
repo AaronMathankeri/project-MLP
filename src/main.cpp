@@ -3,86 +3,15 @@
 #include "mathimf.h"
 #include <vector>
 
-#include "feedForwardFunctions.hpp"
-#include "ioFunctions.hpp"
-#include "initializations.hpp"
+#include "../include/feedForwardFunctions.hpp"
+#include "../include/ioFunctions.hpp"
+#include "../include/initializations.hpp"
+#include "../include/networkAgnosticFunctions.hpp"
+#include "../include/backpropFunctions.hpp"
+#include "../include/gradientDescent.hpp"
 
 using namespace std;
 
-//-----------------------------------------------------
-// MLP network Independent functions
-float crossEntropyFunction( float *t, float *y ){
-      float entropy = 0.0;
-      for (int i = 0; i < NUM_SAMPLES; ++i){
-	    entropy += -(t[i]*log(y[i]) + (1 - t[i])*log(1 - y[i]));		  
-      }
-      return entropy;
-}
-/*
-void logisticSigmoid( float * a , float *sigma, int length){
-      //sigma(a) = 1/(1 + exp(-a))
-      for (int i = 0; i < (length); i++) {
-	    sigma[i] = 1/( 1 + exp(-a[i]));
-      }
-}
-*/
-void dlogisticSigmoid( float * a , float * sigmaPrime, int length){
-      //d/da sigma(a) = sigma(a) * [1 - sigma(a)]
-      logisticSigmoid(a, sigmaPrime, length);
-      for (int i = 0; i < (length); ++i) {
-	    sigmaPrime[i] = sigmaPrime[i]*(1 - sigmaPrime[i] );
-      }
-}
-
-//-----------------------------------------------------
-// BackProp algorithms
-float computeOutputErrors( float* y, float* t){
-      float delta = 0.0;
-      delta = y[(NUM_OUTPUTS - 1)] - t[(NUM_OUTPUTS - 1)];
-      return delta;
-}
-void computeHiddenErrors( float* a, float* secondLayerWeightVector, float delta, float* hiddenDeltas){
-      cout << "Computing Hidden Errors" << endl;
-      float * dA = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
-      float * temp = (float *)mkl_malloc( NUM_HIDDEN_NODES*sizeof( float ), 64 );
-      initializeMatrix( dA, NUM_HIDDEN_NODES, 1);
-      initializeMatrix( temp, NUM_HIDDEN_NODES, 1);
-      
-      dlogisticSigmoid( a, dA, NUM_HIDDEN_NODES );
-      for (int i = 0; i < NUM_HIDDEN_NODES; ++i) {
-	    temp[i] = secondLayerWeightVector[i]*delta;
-	    hiddenDeltas[i] = dA[i]*temp[i];
-      }
-}
-void computeSecondLayerDerivatives( float* z, float delta, float* secondLayerDerivatives){
-      for (int i = 0; i < NUM_HIDDEN_NODES; ++i) {
-	    secondLayerDerivatives[i] += z[i]*delta;
-      }
-}
-void computeFirstLayerDerivatives( float* x, float* hiddenDeltas, float* firstLayerDerivatives){
-      for (int i = 0; i < NUM_HIDDEN_NODES; ++i) {
-	    for (int j = 0; j < NUM_FEATURES; ++j) {
-		  firstLayerDerivatives[i*NUM_FEATURES + j] += hiddenDeltas[i]*x[j];
-	    }
-      }
-}
-//-----------------------------------------------------
-// Gradient descent updates
-void updateFirstLayerWeights( float* firstLayerWeightMatrix, const float* firstLayerDerivatives, const float LEARNING_RATE){
-      for (int i = 0; i < (NUM_HIDDEN_NODES*NUM_FEATURES); ++i) {
-	    firstLayerWeightMatrix[i] = firstLayerWeightMatrix[i] - (LEARNING_RATE*firstLayerDerivatives[i]);
-      }
-      cout << "New values for 1st layer Weight Matrix" << endl;
-      printMatrix( firstLayerWeightMatrix, NUM_HIDDEN_NODES, NUM_FEATURES );
-}
-void updateSecondLayerWeights( float* secondLayerWeightVector, const float* secondLayerDerivatives, const float LEARNING_RATE){
-      for (int i = 0; i < (NUM_HIDDEN_NODES*NUM_OUTPUTS); ++i) {
-	    secondLayerWeightVector[i] = secondLayerWeightVector[i] - (LEARNING_RATE*secondLayerWeightVector[i]);
-      }
-      cout << "New values for output layer Weight Matrix" << endl;
-      printMatrix( secondLayerWeightVector,  NUM_HIDDEN_NODES, NUM_OUTPUTS );
-}
-//-----------------------------------------------------
 int main(int argc, char *argv[])
 {
       cout << " CREATING A SIMPLE NEURAL NET" << endl;

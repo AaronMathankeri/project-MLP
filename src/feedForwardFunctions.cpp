@@ -5,7 +5,7 @@
  *  Detailed description
  *
  */
-#include "feedForwardFunctions.hpp"
+#include "../include/feedForwardFunctions.hpp"
 #include "mathimf.h"
 
 //-----------------------------------------------------
@@ -36,9 +36,4 @@ void computeOutputActivations( float* z, float* secondLayerWeightVector, float* 
       v[(NUM_OUTPUTS - 1)] = res;
 }
 //-----------------------------------------------------
-void logisticSigmoid( float * a , float *sigma, int length){
-      //sigma(a) = 1/(1 + exp(-a))
-      for (int i = 0; i < (length); i++) {
-	    sigma[i] = 1/( 1 + exp(-a[i]));
-      }
-}
+
