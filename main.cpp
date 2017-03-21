@@ -2,39 +2,13 @@
 #include "mkl.h"
 #include "mathimf.h"
 #include <vector>
+
+#include "feedForwardFunctions.hpp"
+#include "ioFunctions.hpp"
+#include "initializations.hpp"
+
 using namespace std;
 
-const int NUM_SAMPLES = 1;
-const int NUM_FEATURES = 2;
-const int NUM_HIDDEN_NODES = 3;
-const int NUM_OUTPUTS = 1;
-const float LEARNING_RATE = 0.01;
-const float THRESH = 0.01;
-//-----------------------------------------------------
-//I-O functions
-void printMatrix( float *Matrix , int nRows, int nCols ){
-      for ( int i = 0; i < nRows ; i++) {
-	    for ( int j = 0; j < nCols ; j++) {
-		  printf ("%12.5f", Matrix[i*nCols + j]);
-	    }
-	    printf ("\n");
-      }
-}
-//-----------------------------------------------------
-//initialize to avoid memory errors
-void initializeMatrix( float * Matrix, int rows, int columns ){
-      memset( Matrix, 0.0,  rows*columns * sizeof(double));      
-}
-float fRand(float fMin, float fMax){
-      float f = (float)rand() / RAND_MAX;
-      return fMin + f * (fMax - fMin);
-}
-void setRandomWeights( float * weights, int nRows, int nCols ){
-      for (int i = 0; i < (nRows*nCols); ++i) {
-	    float temp = fRand( -10.0, 10.0);
-	    weights[i] = temp;
-      }
-}
 //-----------------------------------------------------
 // MLP network Independent functions
 float crossEntropyFunction( float *t, float *y ){
@@ -44,12 +18,14 @@ float crossEntropyFunction( float *t, float *y ){
       }
       return entropy;
 }
+/*
 void logisticSigmoid( float * a , float *sigma, int length){
       //sigma(a) = 1/(1 + exp(-a))
       for (int i = 0; i < (length); i++) {
 	    sigma[i] = 1/( 1 + exp(-a[i]));
       }
 }
+*/
 void dlogisticSigmoid( float * a , float * sigmaPrime, int length){
       //d/da sigma(a) = sigma(a) * [1 - sigma(a)]
       logisticSigmoid(a, sigmaPrime, length);
@@ -57,32 +33,7 @@ void dlogisticSigmoid( float * a , float * sigmaPrime, int length){
 	    sigmaPrime[i] = sigmaPrime[i]*(1 - sigmaPrime[i] );
       }
 }
-//-----------------------------------------------------
-// Feed-forward Functions
-void computeActivations( float* x, float* firstLayerWeightMatrix, float* a){
-      //1. get activations: a_j = \sum_i^D{w_ji * x_i + w_j0}
-      // perform matrix vector multiplication: a = W*x
-      cout << "Computing 1st Layer Activations" << "\n";
-      const float alpha = 1.0;
-      const float beta = 0.0;
-      const int incx = 1;
-      cblas_sgemv( CblasRowMajor, CblasNoTrans, NUM_HIDDEN_NODES, NUM_FEATURES,
-		   alpha, firstLayerWeightMatrix, NUM_FEATURES, x, incx, beta, a, incx);
-}
-void computeHiddenUnits( float* a, float* z, int length){
-      logisticSigmoid( a , z , length);
-}
 
-void computeOutputActivations( float* z, float* secondLayerWeightVector, float* v){
-      // perform matrix vector multiplication: y = W*z
-      cout << "Computing 2nd Layer Activations" << "\n";
-      const float alpha = 1.0;
-      const float beta = 0.0;
-      const int incx = 1;
-      float res = 0.0;
-      res = cblas_sdot( NUM_HIDDEN_NODES, z,incx, secondLayerWeightVector, incx);
-      v[(NUM_OUTPUTS - 1)] = res;
-}
 //-----------------------------------------------------
 // BackProp algorithms
 float computeOutputErrors( float* y, float* t){
