@@ -1,5 +1,5 @@
 CC=icpc
-FLAGS=-std=c++11 -mkl -I ./include/ -Wl,-rpath,${MKLROOT}/lib -L${MKLROOT}/lib -liomp5
+FLAGS=-std=c++11 -mkl -I ./include/ -Wl,-rpath,${MKLROOT}/lib 
 src = $(wildcard ./src/*.cpp)
 
 all: compile clean run
